@@ -3,824 +3,555 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Not-To-Do Liste | Känguru-Modus</title>
+    <title>Not-To-Do Liste | Känguru-Modus mit Ordnung</title>
     <style>
         :root {
             --bg: #0a0a0a;
-            --surface: #000000;
+            --surface: #000;
             --card: #141414;
             --text: #f0f0f0;
-            --text-secondary: #aaaaaa;
+            --text-secondary: #aaa;
             --accent: #d50000;
             --accent-hover: #ff1a1a;
-            --yellow: #ffcc00;
-            --yellow-bg: rgba(255, 204, 0, 0.08);
+            --yellow: #fc0;
+            --yellow-bg: rgba(255,204,0,0.08);
             --border: #2a2a2a;
-            --shadow: 0 8px 32px rgba(0, 0, 0, 0.7);
+            --shadow: 0 8px 32px rgba(0,0,0,0.7);
             --radius: 14px;
             --radius-sm: 10px;
-            --transition: 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-            --font-mono: 'Courier New', 'Liberation Mono', monospace;
+            --transition: 0.25s ease;
+            --font-mono: 'Courier New', monospace;
         }
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
+        *{margin:0;padding:0;box-sizing:border-box;}
         body {
-            font-family: 'Segoe UI', 'Inter', system-ui, -apple-system, sans-serif;
+            font-family: 'Segoe UI', Inter, system-ui, sans-serif;
             background: var(--bg);
             color: var(--text);
             min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: flex-start;
+            display: flex; justify-content: center; align-items: flex-start;
             padding: 20px;
-            line-height: 1.5;
-            -webkit-font-smoothing: antialiased;
-            background-image: radial-gradient(ellipse at 20% 20%, rgba(213, 0, 0, 0.08) 0%, transparent 55%),
-                radial-gradient(ellipse at 80% 70%, rgba(255, 204, 0, 0.05) 0%, transparent 55%);
+            background-image:
+                radial-gradient(ellipse at 20% 20%, rgba(213,0,0,0.08) 0%, transparent 55%),
+                radial-gradient(ellipse at 80% 70%, rgba(255,204,0,0.05) 0%, transparent 55%);
         }
-
         .container {
-            width: 100%;
-            max-width: 600px;
-            margin-top: 20px;
-            display: flex;
-            flex-direction: column;
-            gap: 24px;
+            width: 100%; max-width: 620px; margin-top: 20px;
+            display: flex; flex-direction: column; gap: 24px;
         }
-
-        /* ─── Header ─────────────────────────── */
-        .header {
-            text-align: center;
-            padding: 10px 0;
-        }
+        .header { text-align: center; padding: 10px 0; }
         .header .icon-row {
-            font-size: 3.2rem;
-            margin-bottom: 4px;
-            animation: hop 2.5s ease-in-out infinite;
-            display: inline-block;
+            font-size: 3.2rem; margin-bottom: 4px;
+            animation: hop 2.5s ease-in-out infinite; display: inline-block;
         }
         @keyframes hop {
-            0%,
-            100% {
-                transform: translateY(0);
-            }
-            20% {
-                transform: translateY(-10px);
-            }
-            40% {
-                transform: translateY(0);
-            }
-            60% {
-                transform: translateY(-5px);
-            }
-            80% {
-                transform: translateY(0);
-            }
+            0%,100%{transform:translateY(0);}
+            20%{transform:translateY(-10px);}
+            40%{transform:translateY(0);}
+            60%{transform:translateY(-5px);}
+            80%{transform:translateY(0);}
         }
         .header h1 {
-            font-size: 2.2rem;
-            font-weight: 800;
-            letter-spacing: -0.02em;
-            text-transform: uppercase;
-            color: var(--accent);
-            margin: 0;
-            text-shadow: 0 0 20px rgba(213, 0, 0, 0.4);
+            font-size: 2.2rem; font-weight: 800; text-transform: uppercase;
+            color: var(--accent); margin: 0;
+            text-shadow: 0 0 20px rgba(213,0,0,0.4);
         }
         .header .subtitle {
-            color: var(--text-secondary);
-            font-size: 0.95rem;
-            margin-top: 2px;
-            font-style: italic;
-            font-family: var(--font-mono);
-            opacity: 0.85;
+            color: var(--text-secondary); font-size: 0.95rem;
+            margin-top: 2px; font-style: italic; font-family: var(--font-mono);
         }
-
-        /* ─── Stats ──────────────────────────── */
         .stats-bar {
-            display: flex;
-            gap: 12px;
-            flex-wrap: wrap;
-            justify-content: center;
+            display: flex; gap: 12px; flex-wrap: wrap; justify-content: center;
         }
         .stat-pill {
-            background: var(--card);
-            border: 1px solid var(--border);
-            padding: 10px 18px;
-            border-radius: 30px;
-            font-size: 0.85rem;
-            font-weight: 500;
-            color: var(--text-secondary);
-            display: flex;
-            align-items: center;
-            gap: 7px;
-            transition: var(--transition);
+            background: var(--card); border: 1px solid var(--border);
+            padding: 10px 18px; border-radius: 30px; font-size: 0.85rem;
+            color: var(--text-secondary); display: flex; align-items: center; gap: 7px;
         }
-        .stat-pill span {
-            font-weight: 700;
-            color: var(--text);
-            font-size: 1.1rem;
-        }
-        .stat-pill.danger span {
-            color: var(--accent);
-        }
-        .stat-pill.success span {
-            color: var(--yellow);
-        }
+        .stat-pill span { font-weight: 700; font-size: 1.1rem; }
+        .stat-pill.danger span { color: var(--accent); }
+        .stat-pill.success span { color: var(--yellow); }
 
-        /* ─── Input Card ─────────────────────── */
+        /* InputCard */
         .input-card {
-            background: var(--card);
-            border: 1px solid var(--border);
-            border-radius: var(--radius);
-            padding: 20px;
-            box-shadow: var(--shadow);
-            display: flex;
-            gap: 10px;
-            align-items: center;
-            transition: var(--transition);
+            background: var(--card); border: 1px solid var(--border);
+            border-radius: var(--radius); padding: 20px;
+            box-shadow: var(--shadow); display: flex; gap: 8px;
+            align-items: center; flex-wrap: wrap; transition: var(--transition);
         }
         .input-card:focus-within {
             border-color: var(--accent);
-            box-shadow: 0 8px 32px rgba(213, 0, 0, 0.25);
+            box-shadow: 0 8px 32px rgba(213,0,0,0.25);
         }
-        .input-card input {
-            flex: 1;
-            background: transparent;
-            border: none;
-            outline: none;
-            font-size: 1rem;
-            color: var(--text);
-            padding: 8px 4px;
-            font-family: var(--font-mono);
+        .input-row {
+            display: flex; gap: 8px; flex: 1; min-width: 0;
         }
-        .input-card input::placeholder {
-            color: var(--text-secondary);
-            opacity: 0.6;
-            font-style: italic;
-            font-family: var(--font-mono);
-        }
-        .btn {
-            border: none;
-            cursor: pointer;
-            font-weight: 700;
-            font-size: 0.9rem;
-            padding: 10px 20px;
-            border-radius: 30px;
+        .order-input {
+            width: 48px; background: var(--card); border: 1px solid var(--border);
+            border-radius: 30px; color: var(--text); text-align: center;
+            font-family: var(--font-mono); font-size: 0.9rem; outline: none;
             transition: var(--transition);
-            font-family: inherit;
-            white-space: nowrap;
-            letter-spacing: 0.02em;
-            text-transform: uppercase;
+        }
+        .order-input:focus { border-color: var(--accent); }
+        .order-input::placeholder { color: var(--text-secondary); opacity: 0.5; }
+        .text-input {
+            flex: 1; background: transparent; border: none; outline: none;
+            font-size: 1rem; color: var(--text); padding: 8px 4px;
+            font-family: var(--font-mono);
+        }
+        .text-input::placeholder { color: var(--text-secondary); opacity: 0.6; font-style: italic; }
+        .btn {
+            border: none; cursor: pointer; font-weight: 700; font-size: 0.9rem;
+            padding: 10px 20px; border-radius: 30px; transition: var(--transition);
+            font-family: inherit; text-transform: uppercase; white-space: nowrap;
         }
         .btn-add {
-            background: var(--accent);
-            color: #fff;
-            box-shadow: 0 4px 16px rgba(213, 0, 0, 0.5);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: var(--accent); color: #fff;
+            box-shadow: 0 4px 16px rgba(213,0,0,0.5);
+            border: 1px solid rgba(255,255,255,0.1);
         }
-        .btn-add:hover {
-            background: var(--accent-hover);
-            transform: translateY(-1px);
-            box-shadow: 0 6px 22px rgba(255, 26, 26, 0.6);
-        }
-        .btn-add:active {
-            transform: scale(0.96);
-        }
+        .btn-add:hover { background: var(--accent-hover); transform: translateY(-1px); }
 
-        /* ─── Filter Tabs ───────────────────── */
+        /* Filter Tabs */
         .filter-tabs {
-            display: flex;
-            gap: 6px;
-            background: var(--card);
-            border-radius: 30px;
-            padding: 5px;
-            border: 1px solid var(--border);
+            display: flex; gap: 6px; background: var(--card);
+            border-radius: 30px; padding: 5px; border: 1px solid var(--border);
         }
         .filter-tab {
-            flex: 1;
-            text-align: center;
-            padding: 9px 14px;
-            border-radius: 26px;
-            font-size: 0.85rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: var(--transition);
-            color: var(--text-secondary);
-            background: transparent;
-            border: none;
-            font-family: inherit;
-            text-transform: uppercase;
+            flex: 1; text-align: center; padding: 9px 14px; border-radius: 26px;
+            font-size: 0.85rem; font-weight: 600; cursor: pointer;
+            color: var(--text-secondary); background: transparent; border: none;
+            text-transform: uppercase; transition: var(--transition);
         }
-        .filter-tab.active {
-            background: var(--accent);
-            color: #fff;
-            box-shadow: 0 2px 10px rgba(213, 0, 0, 0.5);
-        }
-        .filter-tab:hover:not(.active) {
-            color: var(--text);
-            background: rgba(255, 255, 255, 0.03);
-        }
+        .filter-tab.active { background: var(--accent); color: #fff; }
+        .filter-tab:hover:not(.active) { color: var(--text); background: rgba(255,255,255,0.03); }
 
-        /* ─── List ───────────────────────────── */
+        /* List */
         .list-card {
-            background: var(--card);
-            border: 1px solid var(--border);
-            border-radius: var(--radius);
-            box-shadow: var(--shadow);
-            overflow: hidden;
+            background: var(--card); border: 1px solid var(--border);
+            border-radius: var(--radius); box-shadow: var(--shadow); overflow: hidden;
         }
         .list-card ul {
-            list-style: none;
-            max-height: 450px;
-            overflow-y: auto;
-            scrollbar-width: thin;
-            scrollbar-color: var(--border) transparent;
+            list-style: none; max-height: 450px; overflow-y: auto;
+            scrollbar-width: thin; scrollbar-color: var(--border) transparent;
         }
-        .list-card ul::-webkit-scrollbar {
-            width: 5px;
-        }
-        .list-card ul::-webkit-scrollbar-thumb {
-            background: var(--border);
-            border-radius: 10px;
-        }
+        .list-card ul::-webkit-scrollbar { width: 5px; }
+        .list-card ul::-webkit-scrollbar-thumb { background: var(--border); border-radius: 10px; }
         .list-card ul li {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            padding: 14px 20px;
-            border-bottom: 1px solid var(--border);
-            transition: var(--transition);
-            animation: slideIn 0.3s ease-out;
+            display: flex; align-items: center; gap: 10px;
+            padding: 12px 16px; border-bottom: 1px solid var(--border);
+            transition: var(--transition); animation: slideIn 0.3s ease;
         }
-        @keyframes slideIn {
-            from {
-                opacity: 0;
-                transform: translateX(-20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateX(0);
-            }
-        }
-        .list-card ul li:last-child {
-            border-bottom: none;
-        }
-        .list-card ul li:hover {
-            background: rgba(255, 255, 255, 0.02);
-        }
+        @keyframes slideIn { from{opacity:0;transform:translateX(-20px);} to{opacity:1;transform:translateX(0);} }
+        .list-card ul li:last-child { border-bottom: none; }
+        .list-card ul li:hover { background: rgba(255,255,255,0.02); }
+        .list-card ul li.done .order-badge { opacity: 0.4; }
         .list-card ul li.done .item-text {
-            text-decoration: line-through;
-            opacity: 0.5;
-            color: var(--yellow);
+            text-decoration: line-through; opacity: 0.5; color: var(--yellow);
         }
-        .list-card ul li.done {
-            background: var(--yellow-bg);
+        .list-card ul li.done { background: var(--yellow-bg); }
+        .order-badge {
+            flex-shrink: 0; width: 28px; height: 28px; border-radius: 50%;
+            background: var(--border); color: var(--text);
+            font-weight: 700; font-size: 0.8rem; font-family: var(--font-mono);
+            display: flex; align-items: center; justify-content: center;
+            text-transform: uppercase; transition: var(--transition);
         }
         .checkbox {
-            flex-shrink: 0;
-            width: 24px;
-            height: 24px;
-            border-radius: 50%;
-            border: 2px solid var(--border);
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: var(--transition);
-            background: transparent;
-            color: transparent;
-            font-size: 12px;
-            font-weight: bold;
+            flex-shrink: 0; width: 24px; height: 24px; border-radius: 50%;
+            border: 2px solid var(--border); cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+            font-weight: bold; font-size: 12px; transition: var(--transition);
+            background: transparent; color: transparent;
         }
-        .checkbox:hover {
-            border-color: var(--accent);
-        }
+        .checkbox:hover { border-color: var(--accent); }
         li.done .checkbox {
-            background: var(--yellow);
-            border-color: var(--yellow);
-            color: #000;
-            box-shadow: 0 0 14px rgba(255, 204, 0, 0.5);
+            background: var(--yellow); border-color: var(--yellow);
+            color: #000; box-shadow: 0 0 14px rgba(255,204,0,0.5);
         }
         .item-text {
-            flex: 1;
-            font-size: 0.95rem;
-            word-break: break-word;
-            transition: var(--transition);
-            font-family: var(--font-mono);
+            flex: 1; font-size: 0.95rem; word-break: break-word;
+            font-family: var(--font-mono); transition: var(--transition);
         }
         .btn-delete {
-            flex-shrink: 0;
-            background: transparent;
-            border: none;
-            color: var(--text-secondary);
-            cursor: pointer;
-            font-size: 1.3rem;
-            width: 32px;
-            height: 32px;
-            border-radius: 50%;
-            transition: var(--transition);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            opacity: 0;
+            flex-shrink: 0; background: transparent; border: none;
+            color: var(--text-secondary); cursor: pointer; font-size: 1.3rem;
+            width: 32px; height: 32px; border-radius: 50%; transition: var(--transition);
+            display: flex; align-items: center; justify-content: center; opacity: 0;
         }
-        .list-card ul li:hover .btn-delete {
-            opacity: 1;
-        }
-        .btn-delete:hover {
-            background: rgba(213, 0, 0, 0.25);
-            color: var(--accent);
-        }
+        .list-card ul li:hover .btn-delete { opacity: 1; }
+        .btn-delete:hover { background: rgba(213,0,0,0.25); color: var(--accent); }
 
-        /* ─── Empty State ───────────────────── */
-        .empty-state {
-            text-align: center;
-            padding: 40px 20px;
-            color: var(--text-secondary);
-            font-family: var(--font-mono);
-        }
-        .empty-state .emoji {
-            font-size: 3rem;
-            display: block;
-            margin-bottom: 10px;
-            opacity: 0.8;
-        }
-        .empty-state p {
-            margin: 4px 0;
-            font-size: 0.9rem;
-        }
+        .empty-state { text-align: center; padding: 40px 20px; color: var(--text-secondary); font-family: var(--font-mono); }
+        .empty-state .emoji { font-size: 3rem; display: block; margin-bottom: 10px; }
 
-        /* ─── Footer Actions ────────────────── */
-        .footer-actions {
-            display: flex;
-            gap: 10px;
-            flex-wrap: wrap;
-            justify-content: center;
-        }
+        .footer-actions { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; }
         .btn-outline {
-            background: transparent;
-            border: 1px solid var(--border);
-            color: var(--text-secondary);
-            padding: 9px 16px;
-            border-radius: 30px;
-            font-size: 0.8rem;
-            cursor: pointer;
+            background: transparent; border: 1px solid var(--border);
+            color: var(--text-secondary); padding: 9px 16px; border-radius: 30px;
+            font-size: 0.8rem; cursor: pointer; font-weight: 600; text-transform: uppercase;
             transition: var(--transition);
-            font-family: inherit;
-            font-weight: 600;
-            text-transform: uppercase;
         }
-        .btn-outline:hover {
-            border-color: var(--accent);
-            color: var(--accent);
-            background: rgba(213, 0, 0, 0.07);
-        }
-        .btn-outline.danger:hover {
-            border-color: #ff4444;
-            color: #ff4444;
-            background: rgba(255, 68, 68, 0.08);
-        }
+        .btn-outline:hover { border-color: var(--accent); color: var(--accent); background: rgba(213,0,0,0.07); }
+        .btn-outline.danger:hover { border-color: #f44; color: #f44; background: rgba(255,68,68,0.08); }
 
-        /* ─── Toast ──────────────────────────── */
         .toast {
-            position: fixed;
-            bottom: 30px;
-            left: 50%;
+            position: fixed; bottom: 30px; left: 50%;
             transform: translateX(-50%) translateY(100px);
-            background: var(--card);
-            border: 1px solid var(--border);
-            padding: 12px 24px;
-            border-radius: 30px;
-            font-size: 0.85rem;
-            font-weight: 600;
-            color: var(--text);
-            box-shadow: 0 8px 28px rgba(0, 0, 0, 0.7);
-            transition: transform 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            z-index: 100;
-            pointer-events: none;
-            font-family: var(--font-mono);
+            background: var(--card); border: 1px solid var(--border);
+            padding: 12px 24px; border-radius: 30px; font-size: 0.85rem;
+            font-weight: 600; color: var(--text); font-family: var(--font-mono);
+            box-shadow: 0 8px 28px rgba(0,0,0,0.7); transition: transform 0.35s ease;
+            z-index: 100; pointer-events: none;
         }
-        .toast.show {
-            transform: translateX(-50%) translateY(0);
-        }
+        .toast.show { transform: translateX(-50%) translateY(0); }
 
-        /* ─── Responsive ────────────────────── */
         @media (max-width: 480px) {
-            .header h1 {
-                font-size: 1.6rem;
-            }
-            .input-card {
-                flex-direction: column;
-                gap: 10px;
-                padding: 16px;
-            }
-            .input-card input {
-                width: 100%;
-                text-align: center;
-            }
-            .btn-add {
-                width: 100%;
-                text-align: center;
-            }
-            .stats-bar {
-                gap: 6px;
-            }
-            .stat-pill {
-                padding: 8px 14px;
-                font-size: 0.78rem;
-            }
-            .filter-tabs {
-                flex-wrap: wrap;
-                border-radius: var(--radius-sm);
-            }
-            .filter-tab {
-                font-size: 0.78rem;
-                padding: 8px 10px;
-            }
-            .list-card ul {
-                max-height: 350px;
-            }
+            .header h1 { font-size: 1.6rem; }
+            .input-card { flex-direction: column; align-items: stretch; }
+            .input-row { flex-wrap: wrap; }
+            .order-input { width: 100%; }
+            .btn-add { width: 100%; text-align: center; }
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <!-- Header -->
-        <header class="header">
-            <div class="icon-row">🦘</div>
-            <h1>Not-To-Do Liste</h1>
-            <p class="subtitle">Ein kleines Känguru-Projekt gegen den Alltagsmist</p>
-        </header>
+<div class="container">
+    <header class="header">
+        <div class="icon-row">🦘</div>
+        <h1>Not-To-Do Liste</h1>
+        <p class="subtitle">Ordnung muss sein – erst Zahlen, dann Buchstaben</p>
+    </header>
 
-        <!-- Stats -->
-        <div class="stats-bar">
-            <div class="stat-pill">📋 Insgesamt: <span id="stat-total">0</span></div>
-            <div class="stat-pill danger">⚠️ Offen: <span id="stat-open">0</span></div>
-            <div class="stat-pill success">✅ Erledigt: <span id="stat-done">0</span></div>
-        </div>
-
-        <!-- Input -->
-        <div class="input-card">
-            <input
-            type="text"
-            id="item-input"
-            placeholder="z.B. Kein Nazi sein..."
-            maxlength="120"
-            autocomplete="off"
-            >
-            <button class="btn btn-add" id="btn-add" title="Hinzufügen">+ Hinzufügen</button>
-        </div>
-
-        <!-- Filter -->
-        <div class="filter-tabs">
-            <button class="filter-tab active" data-filter="all">Alle</button>
-            <button class="filter-tab" data-filter="open">⚠️ Offen</button>
-            <button class="filter-tab" data-filter="done">✅ Abgehakt</button>
-        </div>
-
-        <!-- List -->
-        <div class="list-card">
-            <ul id="item-list"></ul>
-            <div class="empty-state" id="empty-state">
-                <span class="emoji">📝</span>
-                <p><strong>Noch keine Einträge</strong></p>
-                <p>Füge Dinge hinzu, die du vermeiden willst.</p>
-            </div>
-        </div>
-
-        <!-- Footer -->
-        <div class="footer-actions">
-            <button class="btn-outline" id="btn-export" title="Als JSON exportieren">📤 Export</button>
-            <button class="btn-outline" id="btn-import-trigger" title="JSON importieren">📥 Import</button>
-            <button class="btn-outline danger" id="btn-clear-done" title="Nur abgehakte löschen">🧹 Erledigte löschen</button>
-            <button class="btn-outline danger" id="btn-clear-all" title="Alles löschen">🗑️ Alle löschen</button>
-        </div>
-        <input type="file" id="import-file" accept=".json" style="display:none;">
+    <div class="stats-bar">
+        <div class="stat-pill">📋 Insgesamt: <span id="stat-total">0</span></div>
+        <div class="stat-pill danger">⚠️ Offen: <span id="stat-open">0</span></div>
+        <div class="stat-pill success">✅ Erledigt: <span id="stat-done">0</span></div>
     </div>
 
-    <!-- Toast -->
-    <div class="toast" id="toast"></div>
+    <div class="input-card">
+        <div class="input-row">
+            <input type="text" class="order-input" id="order-input" placeholder="1/a" maxlength="3" autocomplete="off" title="Ordnung: Zahl (1) oder Buchstabe (a)">
+            <input type="text" class="text-input" id="item-input" placeholder="z.B. Kein Nazi sein..." maxlength="120" autocomplete="off">
+        </div>
+        <button class="btn btn-add" id="btn-add">+ Hinzufügen</button>
+    </div>
 
-    <script>
-        (function() {
-            // ─── DOM Referenzen ──────────────────
-            const itemInput = document.getElementById('item-input');
-            const btnAdd = document.getElementById('btn-add');
-            const itemList = document.getElementById('item-list');
-            const emptyState = document.getElementById('empty-state');
-            const statTotal = document.getElementById('stat-total');
-            const statOpen = document.getElementById('stat-open');
-            const statDone = document.getElementById('stat-done');
-            const filterTabs = document.querySelectorAll('.filter-tab');
-            const toast = document.getElementById('toast');
-            const btnExport = document.getElementById('btn-export');
-            const btnImportTrigger = document.getElementById('btn-import-trigger');
-            const importFile = document.getElementById('import-file');
-            const btnClearDone = document.getElementById('btn-clear-done');
-            const btnClearAll = document.getElementById('btn-clear-all');
+    <div class="filter-tabs">
+        <button class="filter-tab active" data-filter="all">Alle</button>
+        <button class="filter-tab" data-filter="open">⚠️ Offen</button>
+        <button class="filter-tab" data-filter="done">✅ Abgehakt</button>
+    </div>
 
-            // ─── State ───────────────────────────
-            const STORAGE_KEY = 'not-to-do-list-items';
-            let items = [];
-            let currentFilter = 'all';
-            let toastTimer = null;
+    <div class="list-card">
+        <ul id="item-list"></ul>
+        <div class="empty-state" id="empty-state">
+            <span class="emoji">📝</span>
+            <p><strong>Noch keine Einträge</strong></p>
+            <p>Gib eine Ordnung (1,2,a,b…) und einen Text ein.</p>
+        </div>
+    </div>
 
-            // ─── Toast ───────────────────────────
-            function showToast(message) {
-                if (toastTimer) clearTimeout(toastTimer);
-                toast.textContent = message;
-                toast.classList.add('show');
-                toastTimer = setTimeout(() => {
-                    toast.classList.remove('show');
-                    toastTimer = null;
-                }, 2000);
+    <div class="footer-actions">
+        <button class="btn-outline" id="btn-export">📤 Export</button>
+        <button class="btn-outline" id="btn-import-trigger">📥 Import</button>
+        <button class="btn-outline danger" id="btn-clear-done">🧹 Erledigte löschen</button>
+        <button class="btn-outline danger" id="btn-clear-all">🗑️ Alle löschen</button>
+    </div>
+    <input type="file" id="import-file" accept=".json" style="display:none;">
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+(function() {
+    const orderInput = document.getElementById('order-input');
+    const textInput = document.getElementById('item-input');
+    const btnAdd = document.getElementById('btn-add');
+    const itemList = document.getElementById('item-list');
+    const emptyState = document.getElementById('empty-state');
+    const statTotal = document.getElementById('stat-total');
+    const statOpen = document.getElementById('stat-open');
+    const statDone = document.getElementById('stat-done');
+    const filterTabs = document.querySelectorAll('.filter-tab');
+    const toast = document.getElementById('toast');
+    const btnExport = document.getElementById('btn-export');
+    const btnImportTrigger = document.getElementById('btn-import-trigger');
+    const importFile = document.getElementById('import-file');
+    const btnClearDone = document.getElementById('btn-clear-done');
+    const btnClearAll = document.getElementById('btn-clear-all');
+
+    const STORAGE_KEY = 'not-to-do-ordered';
+    let items = [];
+    let currentFilter = 'all';
+    let toastTimer = null;
+
+    function showToast(msg) {
+        if (toastTimer) clearTimeout(toastTimer);
+        toast.textContent = msg;
+        toast.classList.add('show');
+        toastTimer = setTimeout(() => { toast.classList.remove('show'); }, 2000);
+    }
+
+    function save() {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
+    }
+    function load() {
+        try {
+            const raw = localStorage.getItem(STORAGE_KEY);
+            if (raw) {
+                const parsed = JSON.parse(raw);
+                if (Array.isArray(parsed)) items = parsed;
             }
+        } catch (e) { items = []; }
+    }
 
-            // ─── LocalStorage ────────────────────
-            function saveToStorage() {
-                try {
-                    localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
-                } catch (e) {
-                    showToast('⚠️ Speicher voll – bitte aufräumen, Genosse!');
-                }
+    function normalizeOrder(val) {
+        // val ist String | null
+        if (val === null || val === undefined) return null;
+        const trimmed = val.trim();
+        if (trimmed === '') return null;
+        // Prüfe, ob es eine positive Ganzzahl ist (1, 2, 10 ...)
+        if (/^\d+$/.test(trimmed)) {
+            const num = parseInt(trimmed, 10);
+            return { type: 'number', value: num, raw: trimmed };
+        }
+        // Prüfe, ob ein einzelner Buchstabe (a-z oder A-Z) vorliegt
+        if (/^[a-zA-Z]$/.test(trimmed)) {
+            return { type: 'letter', value: trimmed.toLowerCase(), raw: trimmed };
+        }
+        // Andernfalls als String
+        return { type: 'string', value: trimmed.toLowerCase(), raw: trimmed };
+    }
+
+    function compareOrder(a, b) {
+        const oa = normalizeOrder(a.order);
+        const ob = normalizeOrder(b.order);
+        // Beide nicht gesetzt -> nach Erstellungsdatum (neueste zuerst)
+        if (!oa && !ob) return 0;
+        // Nur a gesetzt -> a kommt vor b
+        if (oa && !ob) return -1;
+        // Nur b gesetzt -> b kommt vor a
+        if (!oa && ob) return 1;
+        // Beide gesetzt
+        if (oa.type === 'number' && ob.type === 'number') {
+            return oa.value - ob.value || a.createdAt - b.createdAt;
+        }
+        if (oa.type === 'number' && ob.type !== 'number') return -1;
+        if (oa.type !== 'number' && ob.type === 'number') return 1;
+        if (oa.type === 'letter' && ob.type === 'letter') {
+            return oa.value.localeCompare(ob.value) || a.createdAt - b.createdAt;
+        }
+        if (oa.type === 'letter' && ob.type === 'string') return -1;
+        if (oa.type === 'string' && ob.type === 'letter') return 1;
+        // beide strings
+        return oa.value.localeCompare(ob.value) || a.createdAt - b.createdAt;
+    }
+
+    function render() {
+        let filtered = items;
+        if (currentFilter === 'open') filtered = items.filter(i => !i.done);
+        else if (currentFilter === 'done') filtered = items.filter(i => i.done);
+
+        // Sortierung: nach Order (1,2,3 … a,b,c …) dann Erstellungsdatum
+        filtered.sort((a, b) => compareOrder(a, b) || b.createdAt - a.createdAt);
+
+        itemList.innerHTML = '';
+        if (filtered.length === 0) {
+            emptyState.style.display = 'block';
+            const strong = emptyState.querySelector('p strong');
+            const last = emptyState.querySelector('p:last-child');
+            const emoji = emptyState.querySelector('.emoji');
+            if (currentFilter === 'open') {
+                strong.textContent = 'Keine offenen Einträge';
+                last.textContent = 'Fantastisch – alles vermieden! 🎉';
+                emoji.textContent = '🎉';
+            } else if (currentFilter === 'done') {
+                strong.textContent = 'Noch nichts abgehakt';
+                last.textContent = 'Vermeide brav weiter.';
+                emoji.textContent = '✅';
+            } else {
+                strong.textContent = 'Noch keine Einträge';
+                last.textContent = 'Füge Dinge mit Ordnung hinzu.';
+                emoji.textContent = '📝';
             }
+        } else {
+            emptyState.style.display = 'none';
+            filtered.forEach(item => {
+                const li = document.createElement('li');
+                if (item.done) li.classList.add('done');
+                li.setAttribute('data-id', item.id);
 
-            function loadFromStorage() {
-                try {
-                    const raw = localStorage.getItem(STORAGE_KEY);
-                    if (raw) {
-                        const parsed = JSON.parse(raw);
-                        if (Array.isArray(parsed)) {
-                            items = parsed;
-                        }
-                    }
-                } catch (e) {
-                    items = [];
-                    showToast('⚠️ Daten kaputt – fangen wir frisch an.');
-                }
-            }
+                const orderBadge = document.createElement('span');
+                orderBadge.className = 'order-badge';
+                orderBadge.textContent = item.order && item.order.trim() !== '' ? item.order.trim() : '–';
 
-            // ─── ID Generator ────────────────────
-            function generateId() {
-                return Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
-            }
+                const checkbox = document.createElement('button');
+                checkbox.className = 'checkbox';
+                checkbox.title = 'Umschalten';
+                checkbox.textContent = item.done ? '✓' : '';
+                checkbox.addEventListener('click', () => toggleItem(item.id));
 
-            // ─── Render ──────────────────────────
-            function render() {
-                let filtered = items;
-                if (currentFilter === 'open') {
-                    filtered = items.filter(item => !item.done);
-                } else if (currentFilter === 'done') {
-                    filtered = items.filter(item => item.done);
-                }
+                const textSpan = document.createElement('span');
+                textSpan.className = 'item-text';
+                textSpan.textContent = item.text;
 
-                // Sort: undone first, then by creation date newest first
-                filtered.sort((a, b) => {
-                    if (a.done && !b.done) return 1;
-                    if (!a.done && b.done) return -1;
-                    return b.createdAt - a.createdAt;
-                });
+                const deleteBtn = document.createElement('button');
+                deleteBtn.className = 'btn-delete';
+                deleteBtn.title = 'Löschen';
+                deleteBtn.textContent = '×';
+                deleteBtn.addEventListener('click', (e) => { e.stopPropagation(); deleteItem(item.id); });
 
-                itemList.innerHTML = '';
-                if (filtered.length === 0) {
-                    emptyState.style.display = 'block';
-                    if (currentFilter === 'open') {
-                        emptyState.querySelector('p strong').textContent = 'Keine offenen Einträge';
-                        emptyState.querySelector('p:last-child').textContent = 'Fantastisch – alles vermieden! 🎉';
-                        emptyState.querySelector('.emoji').textContent = '🎉';
-                    } else if (currentFilter === 'done') {
-                        emptyState.querySelector('p strong').textContent = 'Noch nichts abgehakt';
-                        emptyState.querySelector('p:last-child').textContent =
-                            'Sobald du etwas als vermieden markierst, erscheint es hier.';
-                        emptyState.querySelector('.emoji').textContent = '✅';
-                    } else {
-                        emptyState.querySelector('p strong').textContent = 'Noch keine Einträge';
-                        emptyState.querySelector('p:last-child').textContent =
-                            'Füge Dinge hinzu, die du lieber lassen willst.';
-                        emptyState.querySelector('.emoji').textContent = '📝';
-                    }
-                } else {
-                    emptyState.style.display = 'none';
-                    filtered.forEach(item => {
-                        const li = document.createElement('li');
-                        if (item.done) li.classList.add('done');
-                        li.setAttribute('data-id', item.id);
-                        li.innerHTML = `
-                                <button class="checkbox" title="Umschalten">${item.done ? '✓' : ''}</button>
-                                <span class="item-text">${escapeHTML(item.text)}</span>
-                                <button class="btn-delete" title="Löschen">×</button>
-                            `;
-                        li.querySelector('.checkbox').addEventListener('click', () => toggleItem(item.id));
-                        li.querySelector('.btn-delete').addEventListener('click', (e) => {
-                            e.stopPropagation();
-                            deleteItem(item.id);
-                        });
-                        itemList.appendChild(li);
-                    });
-                }
-
-                updateStats();
-            }
-
-            function updateStats() {
-                const total = items.length;
-                const done = items.filter(i => i.done).length;
-                const open = total - done;
-                statTotal.textContent = total;
-                statOpen.textContent = open;
-                statDone.textContent = done;
-            }
-
-            function escapeHTML(str) {
-                const div = document.createElement('div');
-                div.textContent = str;
-                return div.innerHTML;
-            }
-
-            // ─── Actions ─────────────────────────
-            function addItem() {
-                const text = itemInput.value.trim();
-                if (!text) {
-                    showToast('😅 Schreib was rein, Känguru!');
-                    itemInput.focus();
-                    return;
-                }
-                if (text.length > 120) {
-                    showToast('📏 Maximal 120 Zeichen, sonst Meckerei vom Känguru.');
-                    return;
-                }
-                const duplicate = items.some(item => item.text.toLowerCase() === text.toLowerCase() && !item.done);
-                if (duplicate) {
-                    showToast('⚠️ Steht schon auf der Liste (offen).');
-                    itemInput.select();
-                    return;
-                }
-                const newItem = {
-                    id: generateId(),
-                    text: text,
-                    done: false,
-                    createdAt: Date.now(),
-                };
-                items.unshift(newItem);
-                saveToStorage();
-                itemInput.value = '';
-                itemInput.focus();
-                render();
-                showToast('✅ Hinzugefügt: „' + truncate(text, 35) + '„');
-            }
-
-            function toggleItem(id) {
-                const item = items.find(i => i.id === id);
-                if (!item) return;
-                item.done = !item.done;
-                if (item.done) {
-                    item.doneAt = Date.now();
-                } else {
-                    delete item.doneAt;
-                }
-                saveToStorage();
-                render();
-                const status = item.done ? 'abgehakt ✅' : 'wieder offen ⚠️';
-                showToast('🔄 „' + truncate(item.text, 30) + '„ ' + status);
-            }
-
-            function deleteItem(id) {
-                const item = items.find(i => i.id === id);
-                if (!item) return;
-                if (confirm('Wirklich löschen?\n\n„' + item.text + '„')) {
-                    items = items.filter(i => i.id !== id);
-                    saveToStorage();
-                    render();
-                    showToast('🗑️ Weg damit.');
-                }
-            }
-
-            function clearDone() {
-                const doneCount = items.filter(i => i.done).length;
-                if (doneCount === 0) {
-                    showToast('ℹ️ Nichts abgehakt, Genosse.');
-                    return;
-                }
-                if (confirm(doneCount + ' abgehakte Einträge wirklich löschen?')) {
-                    items = items.filter(i => !i.done);
-                    saveToStorage();
-                    render();
-                    showToast('🧹 ' + doneCount + ' erledigte Einträge entsorgt.');
-                }
-            }
-
-            function clearAll() {
-                if (items.length === 0) {
-                    showToast('ℹ️ Liste ist schon leer.');
-                    return;
-                }
-                if (confirm('ALLE ' + items.length + ' Einträge unwiderruflich löschen?')) {
-                    items = [];
-                    saveToStorage();
-                    render();
-                    showToast('🗑️ Alles platt gemacht.');
-                }
-            }
-
-            function exportData() {
-                if (items.length === 0) {
-                    showToast('ℹ️ Nichts zu exportieren.');
-                    return;
-                }
-                const data = JSON.stringify(items, null, 2);
-                const blob = new Blob([data], { type: 'application/json' });
-                const url = URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = 'not-to-do-liste-backup-' + new Date().toISOString().slice(0, 10) + '.json';
-                document.body.appendChild(a);
-                a.click();
-                document.body.removeChild(a);
-                URL.revokeObjectURL(url);
-                showToast('📤 Exportiert (' + items.length + ' Einträge).');
-            }
-
-            function importData(file) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    try {
-                        const data = JSON.parse(e.target.result);
-                        if (!Array.isArray(data)) throw new Error('Kein gültiges Array.');
-                        const valid = data.every(obj =>
-                            typeof obj === 'object' &&
-                            typeof obj.id === 'string' &&
-                            typeof obj.text === 'string' &&
-                            typeof obj.done === 'boolean' &&
-                            typeof obj.createdAt === 'number'
-                        );
-                        if (!valid) throw new Error('Ungültige Datenstruktur.');
-                        const merge = confirm(
-                            data.length +
-                            ' Einträge gefunden. Mit bestehenden zusammenführen?\n\nOK = Zusammenführen\nAbbrechen = Bestehende ersetzen'
-                            );
-                        if (merge) {
-                            const existingIds = new Set(items.map(i => i.id));
-                            const newItems = data.filter(obj => !existingIds.has(obj.id));
-                            items = [...items, ...newItems];
-                        } else {
-                            items = data;
-                        }
-                        saveToStorage();
-                        render();
-                        showToast('📥 Import abgeschlossen (' + items.length + ' Einträge gesamt).');
-                    } catch (err) {
-                        showToast('❌ Datei kaputt – bitte gültige JSON-Datei wählen.');
-                        console.error('Importfehler:', err);
-                    }
-                };
-                reader.readAsText(file);
-                importFile.value = '';
-            }
-
-            function truncate(str, maxLen) {
-                return str.length > maxLen ? str.slice(0, maxLen) + '…' : str;
-            }
-
-            // ─── Event Listener ──────────────────
-            btnAdd.addEventListener('click', addItem);
-            itemInput.addEventListener('keydown', (e) => {
-                if (e.key === 'Enter') {
-                    e.preventDefault();
-                    addItem();
-                }
+                li.appendChild(orderBadge);
+                li.appendChild(checkbox);
+                li.appendChild(textSpan);
+                li.appendChild(deleteBtn);
+                itemList.appendChild(li);
             });
+        }
+        updateStats();
+    }
 
-            filterTabs.forEach(tab => {
-                tab.addEventListener('click', () => {
-                    filterTabs.forEach(t => t.classList.remove('active'));
-                    tab.classList.add('active');
-                    currentFilter = tab.getAttribute('data-filter');
-                    render();
-                });
-            });
+    function updateStats() {
+        const total = items.length;
+        const done = items.filter(i => i.done).length;
+        statTotal.textContent = total;
+        statOpen.textContent = total - done;
+        statDone.textContent = done;
+    }
 
-            btnExport.addEventListener('click', exportData);
-            btnImportTrigger.addEventListener('click', () => importFile.click());
-            importFile.addEventListener('change', (e) => {
-                if (e.target.files && e.target.files[0]) {
-                    importData(e.target.files[0]);
-                }
-            });
-            btnClearDone.addEventListener('click', clearDone);
-            btnClearAll.addEventListener('click', clearAll);
+    function addItem() {
+        let orderVal = orderInput.value.trim();
+        const textVal = textInput.value.trim();
+        if (!textVal) { showToast('😅 Text fehlt!'); return; }
+        if (textVal.length > 120) { showToast('📏 Max 120 Zeichen!'); return; }
+        // Duplikatprüfung (gleicher Text + gleiche Order und offen)
+        const duplicate = items.some(i =>
+            i.text.toLowerCase() === textVal.toLowerCase() &&
+            (i.order || '') === (orderVal || '') &&
+            !i.done
+        );
+        if (duplicate) { showToast('⚠️ Eintrag existiert bereits (offen).'); return; }
 
-            // ─── Init ────────────────────────────
-            loadFromStorage();
+        const newItem = {
+            id: Date.now().toString(36) + Math.random().toString(36).slice(2,8),
+            text: textVal,
+            order: orderVal || null,
+            done: false,
+            createdAt: Date.now()
+        };
+        items.unshift(newItem);
+        save();
+        orderInput.value = '';
+        textInput.value = '';
+        textInput.focus();
+        render();
+        showToast('✅ „' + (orderVal ? orderVal + ' ' : '') + truncate(textVal, 30) + '„');
+    }
+
+    function toggleItem(id) {
+        const item = items.find(i => i.id === id);
+        if (!item) return;
+        item.done = !item.done;
+        if (item.done) item.doneAt = Date.now(); else delete item.doneAt;
+        save();
+        render();
+        showToast('🔄 „' + truncate(item.text, 25) + '„ ' + (item.done ? 'abgehakt ✅' : 'wieder offen ⚠️'));
+    }
+
+    function deleteItem(id) {
+        const item = items.find(i => i.id === id);
+        if (!item) return;
+        if (confirm('Löschen?\n„' + item.text + '„')) {
+            items = items.filter(i => i.id !== id);
+            save();
             render();
-            itemInput.focus();
+            showToast('🗑️ Gelöscht.');
+        }
+    }
 
-            console.log('🦘 Not-To-Do Liste (Känguru-Edition) gestartet –', items.length, 'Einträge');
-        })();
-    </script>
+    function clearDone() {
+        const count = items.filter(i => i.done).length;
+        if (count === 0) { showToast('ℹ️ Nichts abgehakt.'); return; }
+        if (confirm(count + ' erledigte Einträge löschen?')) {
+            items = items.filter(i => !i.done);
+            save();
+            render();
+            showToast('🧹 ' + count + ' erledigte entsorgt.');
+        }
+    }
+
+    function clearAll() {
+        if (items.length === 0) { showToast('ℹ️ Liste leer.'); return; }
+        if (confirm('ALLE ' + items.length + ' Einträge unwiderruflich löschen?')) {
+            items = [];
+            save();
+            render();
+            showToast('🗑️ Alles platt.');
+        }
+    }
+
+    function exportData() {
+        if (!items.length) { showToast('ℹ️ Nichts zu exportieren.'); return; }
+        const blob = new Blob([JSON.stringify(items, null, 2)], { type: 'application/json' });
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = 'not-to-do-liste-' + new Date().toISOString().slice(0,10) + '.json';
+        a.click(); URL.revokeObjectURL(a.href);
+        showToast('📤 Exportiert (' + items.length + ' Einträge).');
+    }
+
+    function importData(file) {
+        const reader = new FileReader();
+        reader.onload = e => {
+            try {
+                const data = JSON.parse(e.target.result);
+                if (!Array.isArray(data)) throw new Error();
+                const valid = data.every(obj =>
+                    typeof obj.id === 'string' && typeof obj.text === 'string' &&
+                    typeof obj.done === 'boolean' && typeof obj.createdAt === 'number'
+                );
+                if (!valid) throw new Error();
+                const merge = confirm(data.length + ' Einträge gefunden. Zusammenführen?');
+                if (merge) {
+                    const existingIds = new Set(items.map(i => i.id));
+                    items = [...items, ...data.filter(d => !existingIds.has(d.id))];
+                } else items = data;
+                save(); render();
+                showToast('📥 Import abgeschlossen (' + items.length + ' Einträge).');
+            } catch (ex) {
+                showToast('❌ Keine gültige Not-To-Do Datei.');
+            }
+        };
+        reader.readAsText(file);
+        importFile.value = '';
+    }
+
+    function truncate(t, max) { return t.length > max ? t.slice(0, max) + '…' : t; }
+
+    // Event Listener
+    btnAdd.addEventListener('click', addItem);
+    textInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') { e.preventDefault(); addItem(); }
+    });
+    orderInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') { e.preventDefault(); textInput.focus(); }
+    });
+    filterTabs.forEach(tab => tab.addEventListener('click', () => {
+        filterTabs.forEach(t => t.classList.remove('active'));
+        tab.classList.add('active');
+        currentFilter = tab.dataset.filter;
+        render();
+    }));
+    btnExport.addEventListener('click', exportData);
+    btnImportTrigger.addEventListener('click', () => importFile.click());
+    importFile.addEventListener('change', (e) => { if (e.target.files[0]) importData(e.target.files[0]); });
+    btnClearDone.addEventListener('click', clearDone);
+    btnClearAll.addEventListener('click', clearAll);
+
+    load();
+    render();
+    textInput.focus();
+})();
+</script>
 </body>
 </html>
