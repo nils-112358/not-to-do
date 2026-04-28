@@ -1,0 +1,819 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Not-To-Do Liste | Dinge, die ich lassen sollte</title>
+    <style>
+        :root {
+            --bg: #1a1a2e;
+            --surface: #16213e;
+            --card: #1f2b47;
+            --text: #e0e0e0;
+            --text-secondary: #a0a0b8;
+            --accent: #e94560;
+            --accent-hover: #ff6b81;
+            --green: #2ecc71;
+            --green-bg: rgba(46, 204, 113, 0.12);
+            --border: #2a3550;
+            --shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            --radius: 14px;
+            --radius-sm: 10px;
+            --transition: 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', 'Inter', system-ui, -apple-system, sans-serif;
+            background: var(--bg);
+            background-image:
+                radial-gradient(ellipse at 20% 20%, rgba(233, 68, 96, 0.06) 0%, transparent 55%),
+                radial-gradient(ellipse at 80% 70%, rgba(46, 204, 113, 0.04) 0%, transparent 55%),
+                radial-gradient(ellipse at 50% 50%, rgba(100, 100, 180, 0.03) 0%, transparent 70%);
+            color: var(--text);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            padding: 20px;
+            line-height: 1.5;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 600px;
+            margin-top: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+
+        /* ─── Header ─────────────────────────── */
+        .header {
+            text-align: center;
+            padding: 10px 0;
+        }
+        .header .icon-row {
+            font-size: 3rem;
+            margin-bottom: 4px;
+            animation: float 3s ease-in-out infinite;
+        }
+        @keyframes float {
+            0%,
+            100% {
+                transform: translateY(0);
+            }
+            50% {
+                transform: translateY(-8px);
+            }
+        }
+        .header h1 {
+            font-size: 2rem;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            background: linear-gradient(135deg, #e94560, #ff6b81, #f093b0);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin: 0;
+        }
+        .header .subtitle {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+            margin-top: 2px;
+            font-style: italic;
+        }
+
+        /* ─── Stats ──────────────────────────── */
+        .stats-bar {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        .stat-pill {
+            background: var(--card);
+            border: 1px solid var(--border);
+            padding: 10px 18px;
+            border-radius: 30px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            gap: 7px;
+            transition: var(--transition);
+        }
+        .stat-pill span {
+            font-weight: 700;
+            color: var(--text);
+            font-size: 1.1rem;
+        }
+        .stat-pill.danger span {
+            color: var(--accent);
+        }
+        .stat-pill.success span {
+            color: var(--green);
+        }
+
+        /* ─── Input Card ─────────────────────── */
+        .input-card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 20px;
+            box-shadow: var(--shadow);
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            transition: var(--transition);
+        }
+        .input-card:focus-within {
+            border-color: var(--accent);
+            box-shadow: 0 8px 32px rgba(233, 68, 96, 0.2);
+        }
+        .input-card input {
+            flex: 1;
+            background: transparent;
+            border: none;
+            outline: none;
+            font-size: 1rem;
+            color: var(--text);
+            padding: 8px 4px;
+            font-family: inherit;
+        }
+        .input-card input::placeholder {
+            color: var(--text-secondary);
+            opacity: 0.6;
+            font-style: italic;
+        }
+        .btn {
+            border: none;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.9rem;
+            padding: 10px 20px;
+            border-radius: 30px;
+            transition: var(--transition);
+            font-family: inherit;
+            white-space: nowrap;
+            letter-spacing: 0.01em;
+        }
+        .btn-add {
+            background: var(--accent);
+            color: #fff;
+            box-shadow: 0 4px 16px rgba(233, 68, 96, 0.35);
+        }
+        .btn-add:hover {
+            background: var(--accent-hover);
+            transform: translateY(-1px);
+            box-shadow: 0 6px 22px rgba(233, 68, 96, 0.45);
+        }
+        .btn-add:active {
+            transform: scale(0.96);
+        }
+
+        /* ─── Filter Tabs ───────────────────── */
+        .filter-tabs {
+            display: flex;
+            gap: 6px;
+            background: var(--card);
+            border-radius: 30px;
+            padding: 5px;
+            border: 1px solid var(--border);
+        }
+        .filter-tab {
+            flex: 1;
+            text-align: center;
+            padding: 9px 14px;
+            border-radius: 26px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: var(--transition);
+            color: var(--text-secondary);
+            background: transparent;
+            border: none;
+            font-family: inherit;
+        }
+        .filter-tab.active {
+            background: var(--accent);
+            color: #fff;
+            box-shadow: 0 2px 10px rgba(233, 68, 96, 0.3);
+        }
+        .filter-tab:hover:not(.active) {
+            color: var(--text);
+            background: rgba(255, 255, 255, 0.03);
+        }
+
+        /* ─── List ───────────────────────────── */
+        .list-card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            overflow: hidden;
+        }
+        .list-card ul {
+            list-style: none;
+            max-height: 450px;
+            overflow-y: auto;
+            scrollbar-width: thin;
+            scrollbar-color: var(--border) transparent;
+        }
+        .list-card ul::-webkit-scrollbar {
+            width: 5px;
+        }
+        .list-card ul::-webkit-scrollbar-thumb {
+            background: var(--border);
+            border-radius: 10px;
+        }
+        .list-card ul li {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 14px 20px;
+            border-bottom: 1px solid var(--border);
+            transition: var(--transition);
+            animation: slideIn 0.3s ease-out;
+        }
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+        .list-card ul li:last-child {
+            border-bottom: none;
+        }
+        .list-card ul li:hover {
+            background: rgba(255, 255, 255, 0.015);
+        }
+        .list-card ul li.done .item-text {
+            text-decoration: line-through;
+            opacity: 0.45;
+            color: var(--text-secondary);
+        }
+        .list-card ul li.done {
+            background: rgba(46, 204, 113, 0.03);
+        }
+        .checkbox {
+            flex-shrink: 0;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            border: 2px solid var(--border);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: var(--transition);
+            background: transparent;
+            color: transparent;
+            font-size: 12px;
+        }
+        .checkbox:hover {
+            border-color: var(--accent);
+        }
+        li.done .checkbox {
+            background: var(--green);
+            border-color: var(--green);
+            color: #fff;
+            box-shadow: 0 0 12px rgba(46, 204, 113, 0.4);
+        }
+        .item-text {
+            flex: 1;
+            font-size: 0.95rem;
+            word-break: break-word;
+            transition: var(--transition);
+            cursor: default;
+        }
+        .btn-delete {
+            flex-shrink: 0;
+            background: transparent;
+            border: none;
+            color: var(--text-secondary);
+            cursor: pointer;
+            font-size: 1.2rem;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+        }
+        .list-card ul li:hover .btn-delete {
+            opacity: 1;
+        }
+        .btn-delete:hover {
+            background: rgba(233, 68, 96, 0.2);
+            color: var(--accent);
+        }
+
+        /* ─── Empty State ───────────────────── */
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: var(--text-secondary);
+        }
+        .empty-state .emoji {
+            font-size: 3rem;
+            display: block;
+            margin-bottom: 10px;
+            opacity: 0.7;
+        }
+        .empty-state p {
+            margin: 4px 0;
+            font-size: 0.9rem;
+        }
+
+        /* ─── Footer Actions ────────────────── */
+        .footer-actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        .btn-outline {
+            background: transparent;
+            border: 1px solid var(--border);
+            color: var(--text-secondary);
+            padding: 9px 16px;
+            border-radius: 30px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: var(--transition);
+            font-family: inherit;
+        }
+        .btn-outline:hover {
+            border-color: var(--accent);
+            color: var(--accent);
+            background: rgba(233, 68, 96, 0.05);
+        }
+        .btn-outline.danger:hover {
+            border-color: #e74c3c;
+            color: #e74c3c;
+            background: rgba(231, 76, 60, 0.08);
+        }
+
+        /* ─── Toast ──────────────────────────── */
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background: var(--card);
+            border: 1px solid var(--border);
+            padding: 12px 24px;
+            border-radius: 30px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: var(--text);
+            box-shadow: 0 8px 28px rgba(0, 0, 0, 0.5);
+            transition: transform 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            z-index: 100;
+            pointer-events: none;
+        }
+        .toast.show {
+            transform: translateX(-50%) translateY(0);
+        }
+
+        /* ─── Responsive ────────────────────── */
+        @media (max-width: 480px) {
+            .header h1 {
+                font-size: 1.5rem;
+            }
+            .input-card {
+                flex-direction: column;
+                gap: 10px;
+                padding: 16px;
+            }
+            .input-card input {
+                width: 100%;
+                text-align: center;
+            }
+            .btn-add {
+                width: 100%;
+                text-align: center;
+            }
+            .stats-bar {
+                gap: 6px;
+            }
+            .stat-pill {
+                padding: 8px 14px;
+                font-size: 0.78rem;
+            }
+            .filter-tabs {
+                flex-wrap: wrap;
+                border-radius: var(--radius-sm);
+            }
+            .filter-tab {
+                font-size: 0.78rem;
+                padding: 8px 10px;
+            }
+            .list-card ul {
+                max-height: 350px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <div class="icon-row">🚫</div>
+            <h1>Not-To-Do Liste</h1>
+            <p class="subtitle">Dinge, die ich bewusst <strong>nicht</strong> tun will</p>
+        </header>
+
+        <!-- Stats -->
+        <div class="stats-bar">
+            <div class="stat-pill">📋 Insgesamt: <span id="stat-total">0</span></div>
+            <div class="stat-pill danger">⚠️ Offen: <span id="stat-open">0</span></div>
+            <div class="stat-pill success">✅ Erledigt: <span id="stat-done">0</span></div>
+        </div>
+
+        <!-- Input -->
+        <div class="input-card">
+            <input
+            type="text"
+            id="item-input"
+            placeholder="z.B. Nicht zu spät schlafen gehen..."
+            maxlength="120"
+            autocomplete="off"
+            >
+            <button class="btn btn-add" id="btn-add" title="Hinzufügen">+ Hinzufügen</button>
+        </div>
+
+        <!-- Filter -->
+        <div class="filter-tabs">
+            <button class="filter-tab active" data-filter="all">Alle</button>
+            <button class="filter-tab" data-filter="open">⚠️ Offen</button>
+            <button class="filter-tab" data-filter="done">✅ Abgehakt</button>
+        </div>
+
+        <!-- List -->
+        <div class="list-card">
+            <ul id="item-list"></ul>
+            <div class="empty-state" id="empty-state">
+                <span class="emoji">📝</span>
+                <p><strong>Noch keine Einträge</strong></p>
+                <p>Füge Dinge hinzu, die du vermeiden möchtest.</p>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="footer-actions">
+            <button class="btn-outline" id="btn-export" title="Als JSON exportieren">📤 Export</button>
+            <button class="btn-outline" id="btn-import-trigger" title="JSON importieren">📥 Import</button>
+            <button class="btn-outline danger" id="btn-clear-done" title="Nur abgehakte löschen">🧹 Erledigte löschen</button>
+            <button class="btn-outline danger" id="btn-clear-all" title="Alles löschen">🗑️ Alle löschen</button>
+        </div>
+        <input type="file" id="import-file" accept=".json" style="display:none;">
+    </div>
+
+    <!-- Toast -->
+    <div class="toast" id="toast"></div>
+
+    <script>
+        (function() {
+            // ─── DOM Referenzen ──────────────────
+            const itemInput = document.getElementById('item-input');
+            const btnAdd = document.getElementById('btn-add');
+            const itemList = document.getElementById('item-list');
+            const emptyState = document.getElementById('empty-state');
+            const statTotal = document.getElementById('stat-total');
+            const statOpen = document.getElementById('stat-open');
+            const statDone = document.getElementById('stat-done');
+            const filterTabs = document.querySelectorAll('.filter-tab');
+            const toast = document.getElementById('toast');
+            const btnExport = document.getElementById('btn-export');
+            const btnImportTrigger = document.getElementById('btn-import-trigger');
+            const importFile = document.getElementById('import-file');
+            const btnClearDone = document.getElementById('btn-clear-done');
+            const btnClearAll = document.getElementById('btn-clear-all');
+
+            // ─── State ───────────────────────────
+            const STORAGE_KEY = 'not-to-do-list-items';
+            let items = [];
+            let currentFilter = 'all';
+            let toastTimer = null;
+
+            // ─── Toast ───────────────────────────
+            function showToast(message) {
+                if (toastTimer) clearTimeout(toastTimer);
+                toast.textContent = message;
+                toast.classList.add('show');
+                toastTimer = setTimeout(() => {
+                    toast.classList.remove('show');
+                    toastTimer = null;
+                }, 2000);
+            }
+
+            // ─── LocalStorage ────────────────────
+            function saveToStorage() {
+                try {
+                    localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
+                } catch (e) {
+                    showToast('⚠️ Speicher voll – bitte aufräumen!');
+                }
+            }
+
+            function loadFromStorage() {
+                try {
+                    const raw = localStorage.getItem(STORAGE_KEY);
+                    if (raw) {
+                        const parsed = JSON.parse(raw);
+                        if (Array.isArray(parsed)) {
+                            items = parsed;
+                        }
+                    }
+                } catch (e) {
+                    items = [];
+                    showToast('⚠️ Daten konnten nicht geladen werden.');
+                }
+            }
+
+            // ─── ID Generator ────────────────────
+            function generateId() {
+                return Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
+            }
+
+            // ─── Render ──────────────────────────
+            function render() {
+                // Filter
+                let filtered = items;
+                if (currentFilter === 'open') {
+                    filtered = items.filter(item => !item.done);
+                } else if (currentFilter === 'done') {
+                    filtered = items.filter(item => item.done);
+                }
+
+                // Sort: undone first, then by creation date newest first
+                filtered.sort((a, b) => {
+                    if (a.done && !b.done) return 1;
+                    if (!a.done && b.done) return -1;
+                    return b.createdAt - a.createdAt;
+                });
+
+                // Render list
+                itemList.innerHTML = '';
+                if (filtered.length === 0) {
+                    emptyState.style.display = 'block';
+                    if (currentFilter === 'open') {
+                        emptyState.querySelector('p strong').textContent = 'Keine offenen Einträge';
+                        emptyState.querySelector('p:last-child').textContent = 'Gut gemacht – nichts steht mehr an! 🎉';
+                        emptyState.querySelector('.emoji').textContent = '🎉';
+                    } else if (currentFilter === 'done') {
+                        emptyState.querySelector('p strong').textContent = 'Noch nichts abgehakt';
+                        emptyState.querySelector('p:last-child').textContent =
+                            'Sobald du Dinge als erledigt markierst, erscheinen sie hier.';
+                        emptyState.querySelector('.emoji').textContent = '✅';
+                    } else {
+                        emptyState.querySelector('p strong').textContent = 'Noch keine Einträge';
+                        emptyState.querySelector('p:last-child').textContent =
+                            'Füge Dinge hinzu, die du vermeiden möchtest.';
+                        emptyState.querySelector('.emoji').textContent = '📝';
+                    }
+                } else {
+                    emptyState.style.display = 'none';
+                    filtered.forEach(item => {
+                        const li = document.createElement('li');
+                        if (item.done) li.classList.add('done');
+                        li.setAttribute('data-id', item.id);
+                        li.innerHTML = `
+                                <button class="checkbox" title="Umschalten">${item.done ? '✓' : ''}</button>
+                                <span class="item-text">${escapeHTML(item.text)}</span>
+                                <button class="btn-delete" title="Löschen">×</button>
+                            `;
+                        // Checkbox click
+                        li.querySelector('.checkbox').addEventListener('click', () => toggleItem(item.id));
+                        // Delete click
+                        li.querySelector('.btn-delete').addEventListener('click', (e) => {
+                            e.stopPropagation();
+                            deleteItem(item.id);
+                        });
+                        itemList.appendChild(li);
+                    });
+                }
+
+                // Update stats
+                updateStats();
+            }
+
+            function updateStats() {
+                const total = items.length;
+                const done = items.filter(i => i.done).length;
+                const open = total - done;
+                statTotal.textContent = total;
+                statOpen.textContent = open;
+                statDone.textContent = done;
+            }
+
+            function escapeHTML(str) {
+                const div = document.createElement('div');
+                div.textContent = str;
+                return div.innerHTML;
+            }
+
+            // ─── Actions ─────────────────────────
+            function addItem() {
+                const text = itemInput.value.trim();
+                if (!text) {
+                    showToast('😅 Bitte etwas eingeben!');
+                    itemInput.focus();
+                    return;
+                }
+                if (text.length > 120) {
+                    showToast('📏 Maximal 120 Zeichen erlaubt.');
+                    return;
+                }
+                // Check for duplicates (same text, not done)
+                const duplicate = items.some(item => item.text.toLowerCase() === text.toLowerCase() && !item
+                    .done);
+                if (duplicate) {
+                    showToast('⚠️ Dieser Eintrag existiert bereits (offen).');
+                    itemInput.select();
+                    return;
+                }
+                const newItem = {
+                    id: generateId(),
+                    text: text,
+                    done: false,
+                    createdAt: Date.now(),
+                };
+                items.unshift(newItem);
+                saveToStorage();
+                itemInput.value = '';
+                itemInput.focus();
+                render();
+                showToast('✅ Hinzugefügt: „' + truncate(text, 35) + '„');
+            }
+
+            function toggleItem(id) {
+                const item = items.find(i => i.id === id);
+                if (!item) return;
+                item.done = !item.done;
+                if (item.done) {
+                    item.doneAt = Date.now();
+                } else {
+                    delete item.doneAt;
+                }
+                saveToStorage();
+                render();
+                const status = item.done ? 'abgehakt ✅' : 'wieder offen ⚠️';
+                showToast('🔄 „' + truncate(item.text, 30) + '„ ' + status);
+            }
+
+            function deleteItem(id) {
+                const item = items.find(i => i.id === id);
+                if (!item) return;
+                if (confirm('Wirklich löschen?\n\n„' + item.text + '„')) {
+                    items = items.filter(i => i.id !== id);
+                    saveToStorage();
+                    render();
+                    showToast('🗑️ Gelöscht.');
+                }
+            }
+
+            function clearDone() {
+                const doneCount = items.filter(i => i.done).length;
+                if (doneCount === 0) {
+                    showToast('ℹ️ Keine erledigten Einträge vorhanden.');
+                    return;
+                }
+                if (confirm(doneCount + ' erledigte Einträge wirklich löschen?')) {
+                    items = items.filter(i => !i.done);
+                    saveToStorage();
+                    render();
+                    showToast('🧹 ' + doneCount + ' erledigte Einträge entfernt.');
+                }
+            }
+
+            function clearAll() {
+                if (items.length === 0) {
+                    showToast('ℹ️ Die Liste ist bereits leer.');
+                    return;
+                }
+                if (confirm('ALLE ' + items.length + ' Einträge unwiderruflich löschen?')) {
+                    items = [];
+                    saveToStorage();
+                    render();
+                    showToast('🗑️ Alle Einträge gelöscht.');
+                }
+            }
+
+            function exportData() {
+                if (items.length === 0) {
+                    showToast('ℹ️ Nichts zum Exportieren.');
+                    return;
+                }
+                const data = JSON.stringify(items, null, 2);
+                const blob = new Blob([data], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'not-to-do-liste-backup-' + new Date().toISOString().slice(0, 10) + '.json';
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+                showToast('📤 Exportiert (' + items.length + ' Einträge).');
+            }
+
+            function importData(file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    try {
+                        const data = JSON.parse(e.target.result);
+                        if (!Array.isArray(data)) throw new Error('Kein gültiges Array.');
+                        // Validate structure
+                        const valid = data.every(obj =>
+                            typeof obj === 'object' &&
+                            typeof obj.id === 'string' &&
+                            typeof obj.text === 'string' &&
+                            typeof obj.done === 'boolean' &&
+                            typeof obj.createdAt === 'number'
+                        );
+                        if (!valid) throw new Error('Ungültige Datenstruktur.');
+                        const merge = confirm(
+                            data.length +
+                            ' Einträge gefunden. Mit bestehenden zusammenführen?\n\nOK = Zusammenführen\nAbbrechen = Bestehende ersetzen'
+                            );
+                        if (merge) {
+                            // Merge: add only items with new IDs
+                            const existingIds = new Set(items.map(i => i.id));
+                            const newItems = data.filter(obj => !existingIds.has(obj.id));
+                            items = [...items, ...newItems];
+                        } else {
+                            items = data;
+                        }
+                        saveToStorage();
+                        render();
+                        showToast('📥 Import abgeschlossen (' + items.length + ' Einträge gesamt).');
+                    } catch (err) {
+                        showToast('❌ Ungültige Datei – bitte eine gültige JSON-Datei wählen.');
+                        console.error('Importfehler:', err);
+                    }
+                };
+                reader.readAsText(file);
+                // Reset file input
+                importFile.value = '';
+            }
+
+            function truncate(str, maxLen) {
+                return str.length > maxLen ? str.slice(0, maxLen) + '…' : str;
+            }
+
+            // ─── Event Listener ──────────────────
+            btnAdd.addEventListener('click', addItem);
+            itemInput.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    addItem();
+                }
+            });
+
+            filterTabs.forEach(tab => {
+                tab.addEventListener('click', () => {
+                    filterTabs.forEach(t => t.classList.remove('active'));
+                    tab.classList.add('active');
+                    currentFilter = tab.getAttribute('data-filter');
+                    render();
+                });
+            });
+
+            btnExport.addEventListener('click', exportData);
+            btnImportTrigger.addEventListener('click', () => importFile.click());
+            importFile.addEventListener('change', (e) => {
+                if (e.target.files && e.target.files[0]) {
+                    importData(e.target.files[0]);
+                }
+            });
+            btnClearDone.addEventListener('click', clearDone);
+            btnClearAll.addEventListener('click', clearAll);
+
+            // ─── Init ────────────────────────────
+            loadFromStorage();
+            render();
+            itemInput.focus();
+
+            console.log('🚫 Not-To-Do Liste geladen –', items.length, 'Einträge');
+            console.log('💾 Speicher:', STORAGE_KEY);
+            console.log('📋 Filter:', currentFilter);
+        })();
+    </script>
+</body>
+</html>
