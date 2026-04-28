@@ -3,23 +3,24 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Not-To-Do Liste | Dinge, die ich lassen sollte</title>
+    <title>Not-To-Do Liste | Känguru-Modus</title>
     <style>
         :root {
-            --bg: #1a1a2e;
-            --surface: #16213e;
-            --card: #1f2b47;
-            --text: #e0e0e0;
-            --text-secondary: #a0a0b8;
-            --accent: #e94560;
-            --accent-hover: #ff6b81;
-            --green: #2ecc71;
-            --green-bg: rgba(46, 204, 113, 0.12);
-            --border: #2a3550;
-            --shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            --bg: #0a0a0a;
+            --surface: #000000;
+            --card: #141414;
+            --text: #f0f0f0;
+            --text-secondary: #aaaaaa;
+            --accent: #d50000;
+            --accent-hover: #ff1a1a;
+            --yellow: #ffcc00;
+            --yellow-bg: rgba(255, 204, 0, 0.08);
+            --border: #2a2a2a;
+            --shadow: 0 8px 32px rgba(0, 0, 0, 0.7);
             --radius: 14px;
             --radius-sm: 10px;
             --transition: 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            --font-mono: 'Courier New', 'Liberation Mono', monospace;
         }
 
         * {
@@ -31,10 +32,6 @@
         body {
             font-family: 'Segoe UI', 'Inter', system-ui, -apple-system, sans-serif;
             background: var(--bg);
-            background-image:
-                radial-gradient(ellipse at 20% 20%, rgba(233, 68, 96, 0.06) 0%, transparent 55%),
-                radial-gradient(ellipse at 80% 70%, rgba(46, 204, 113, 0.04) 0%, transparent 55%),
-                radial-gradient(ellipse at 50% 50%, rgba(100, 100, 180, 0.03) 0%, transparent 70%);
             color: var(--text);
             min-height: 100vh;
             display: flex;
@@ -43,6 +40,8 @@
             padding: 20px;
             line-height: 1.5;
             -webkit-font-smoothing: antialiased;
+            background-image: radial-gradient(ellipse at 20% 20%, rgba(213, 0, 0, 0.08) 0%, transparent 55%),
+                radial-gradient(ellipse at 80% 70%, rgba(255, 204, 0, 0.05) 0%, transparent 55%);
         }
 
         .container {
@@ -60,34 +59,45 @@
             padding: 10px 0;
         }
         .header .icon-row {
-            font-size: 3rem;
+            font-size: 3.2rem;
             margin-bottom: 4px;
-            animation: float 3s ease-in-out infinite;
+            animation: hop 2.5s ease-in-out infinite;
+            display: inline-block;
         }
-        @keyframes float {
+        @keyframes hop {
             0%,
             100% {
                 transform: translateY(0);
             }
-            50% {
-                transform: translateY(-8px);
+            20% {
+                transform: translateY(-10px);
+            }
+            40% {
+                transform: translateY(0);
+            }
+            60% {
+                transform: translateY(-5px);
+            }
+            80% {
+                transform: translateY(0);
             }
         }
         .header h1 {
-            font-size: 2rem;
-            font-weight: 700;
+            font-size: 2.2rem;
+            font-weight: 800;
             letter-spacing: -0.02em;
-            background: linear-gradient(135deg, #e94560, #ff6b81, #f093b0);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
+            text-transform: uppercase;
+            color: var(--accent);
             margin: 0;
+            text-shadow: 0 0 20px rgba(213, 0, 0, 0.4);
         }
         .header .subtitle {
             color: var(--text-secondary);
             font-size: 0.95rem;
             margin-top: 2px;
             font-style: italic;
+            font-family: var(--font-mono);
+            opacity: 0.85;
         }
 
         /* ─── Stats ──────────────────────────── */
@@ -119,7 +129,7 @@
             color: var(--accent);
         }
         .stat-pill.success span {
-            color: var(--green);
+            color: var(--yellow);
         }
 
         /* ─── Input Card ─────────────────────── */
@@ -136,7 +146,7 @@
         }
         .input-card:focus-within {
             border-color: var(--accent);
-            box-shadow: 0 8px 32px rgba(233, 68, 96, 0.2);
+            box-shadow: 0 8px 32px rgba(213, 0, 0, 0.25);
         }
         .input-card input {
             flex: 1;
@@ -146,34 +156,37 @@
             font-size: 1rem;
             color: var(--text);
             padding: 8px 4px;
-            font-family: inherit;
+            font-family: var(--font-mono);
         }
         .input-card input::placeholder {
             color: var(--text-secondary);
             opacity: 0.6;
             font-style: italic;
+            font-family: var(--font-mono);
         }
         .btn {
             border: none;
             cursor: pointer;
-            font-weight: 600;
+            font-weight: 700;
             font-size: 0.9rem;
             padding: 10px 20px;
             border-radius: 30px;
             transition: var(--transition);
             font-family: inherit;
             white-space: nowrap;
-            letter-spacing: 0.01em;
+            letter-spacing: 0.02em;
+            text-transform: uppercase;
         }
         .btn-add {
             background: var(--accent);
             color: #fff;
-            box-shadow: 0 4px 16px rgba(233, 68, 96, 0.35);
+            box-shadow: 0 4px 16px rgba(213, 0, 0, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.1);
         }
         .btn-add:hover {
             background: var(--accent-hover);
             transform: translateY(-1px);
-            box-shadow: 0 6px 22px rgba(233, 68, 96, 0.45);
+            box-shadow: 0 6px 22px rgba(255, 26, 26, 0.6);
         }
         .btn-add:active {
             transform: scale(0.96);
@@ -194,18 +207,19 @@
             padding: 9px 14px;
             border-radius: 26px;
             font-size: 0.85rem;
-            font-weight: 500;
+            font-weight: 600;
             cursor: pointer;
             transition: var(--transition);
             color: var(--text-secondary);
             background: transparent;
             border: none;
             font-family: inherit;
+            text-transform: uppercase;
         }
         .filter-tab.active {
             background: var(--accent);
             color: #fff;
-            box-shadow: 0 2px 10px rgba(233, 68, 96, 0.3);
+            box-shadow: 0 2px 10px rgba(213, 0, 0, 0.5);
         }
         .filter-tab:hover:not(.active) {
             color: var(--text);
@@ -257,15 +271,15 @@
             border-bottom: none;
         }
         .list-card ul li:hover {
-            background: rgba(255, 255, 255, 0.015);
+            background: rgba(255, 255, 255, 0.02);
         }
         .list-card ul li.done .item-text {
             text-decoration: line-through;
-            opacity: 0.45;
-            color: var(--text-secondary);
+            opacity: 0.5;
+            color: var(--yellow);
         }
         .list-card ul li.done {
-            background: rgba(46, 204, 113, 0.03);
+            background: var(--yellow-bg);
         }
         .checkbox {
             flex-shrink: 0;
@@ -281,22 +295,23 @@
             background: transparent;
             color: transparent;
             font-size: 12px;
+            font-weight: bold;
         }
         .checkbox:hover {
             border-color: var(--accent);
         }
         li.done .checkbox {
-            background: var(--green);
-            border-color: var(--green);
-            color: #fff;
-            box-shadow: 0 0 12px rgba(46, 204, 113, 0.4);
+            background: var(--yellow);
+            border-color: var(--yellow);
+            color: #000;
+            box-shadow: 0 0 14px rgba(255, 204, 0, 0.5);
         }
         .item-text {
             flex: 1;
             font-size: 0.95rem;
             word-break: break-word;
             transition: var(--transition);
-            cursor: default;
+            font-family: var(--font-mono);
         }
         .btn-delete {
             flex-shrink: 0;
@@ -304,7 +319,7 @@
             border: none;
             color: var(--text-secondary);
             cursor: pointer;
-            font-size: 1.2rem;
+            font-size: 1.3rem;
             width: 32px;
             height: 32px;
             border-radius: 50%;
@@ -318,7 +333,7 @@
             opacity: 1;
         }
         .btn-delete:hover {
-            background: rgba(233, 68, 96, 0.2);
+            background: rgba(213, 0, 0, 0.25);
             color: var(--accent);
         }
 
@@ -327,12 +342,13 @@
             text-align: center;
             padding: 40px 20px;
             color: var(--text-secondary);
+            font-family: var(--font-mono);
         }
         .empty-state .emoji {
             font-size: 3rem;
             display: block;
             margin-bottom: 10px;
-            opacity: 0.7;
+            opacity: 0.8;
         }
         .empty-state p {
             margin: 4px 0;
@@ -356,16 +372,18 @@
             cursor: pointer;
             transition: var(--transition);
             font-family: inherit;
+            font-weight: 600;
+            text-transform: uppercase;
         }
         .btn-outline:hover {
             border-color: var(--accent);
             color: var(--accent);
-            background: rgba(233, 68, 96, 0.05);
+            background: rgba(213, 0, 0, 0.07);
         }
         .btn-outline.danger:hover {
-            border-color: #e74c3c;
-            color: #e74c3c;
-            background: rgba(231, 76, 60, 0.08);
+            border-color: #ff4444;
+            color: #ff4444;
+            background: rgba(255, 68, 68, 0.08);
         }
 
         /* ─── Toast ──────────────────────────── */
@@ -379,12 +397,13 @@
             padding: 12px 24px;
             border-radius: 30px;
             font-size: 0.85rem;
-            font-weight: 500;
+            font-weight: 600;
             color: var(--text);
-            box-shadow: 0 8px 28px rgba(0, 0, 0, 0.5);
+            box-shadow: 0 8px 28px rgba(0, 0, 0, 0.7);
             transition: transform 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             z-index: 100;
             pointer-events: none;
+            font-family: var(--font-mono);
         }
         .toast.show {
             transform: translateX(-50%) translateY(0);
@@ -393,7 +412,7 @@
         /* ─── Responsive ────────────────────── */
         @media (max-width: 480px) {
             .header h1 {
-                font-size: 1.5rem;
+                font-size: 1.6rem;
             }
             .input-card {
                 flex-direction: column;
@@ -433,9 +452,9 @@
     <div class="container">
         <!-- Header -->
         <header class="header">
-            <div class="icon-row">🚫</div>
+            <div class="icon-row">🦘</div>
             <h1>Not-To-Do Liste</h1>
-            <p class="subtitle">Dinge, die ich bewusst <strong>nicht</strong> tun will</p>
+            <p class="subtitle">Ein kleines Känguru-Projekt gegen den Alltagsmist</p>
         </header>
 
         <!-- Stats -->
@@ -450,7 +469,7 @@
             <input
             type="text"
             id="item-input"
-            placeholder="z.B. Nicht zu spät schlafen gehen..."
+            placeholder="z.B. Kein Nazi sein..."
             maxlength="120"
             autocomplete="off"
             >
@@ -470,7 +489,7 @@
             <div class="empty-state" id="empty-state">
                 <span class="emoji">📝</span>
                 <p><strong>Noch keine Einträge</strong></p>
-                <p>Füge Dinge hinzu, die du vermeiden möchtest.</p>
+                <p>Füge Dinge hinzu, die du vermeiden willst.</p>
             </div>
         </div>
 
@@ -527,7 +546,7 @@
                 try {
                     localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
                 } catch (e) {
-                    showToast('⚠️ Speicher voll – bitte aufräumen!');
+                    showToast('⚠️ Speicher voll – bitte aufräumen, Genosse!');
                 }
             }
 
@@ -542,7 +561,7 @@
                     }
                 } catch (e) {
                     items = [];
-                    showToast('⚠️ Daten konnten nicht geladen werden.');
+                    showToast('⚠️ Daten kaputt – fangen wir frisch an.');
                 }
             }
 
@@ -553,7 +572,6 @@
 
             // ─── Render ──────────────────────────
             function render() {
-                // Filter
                 let filtered = items;
                 if (currentFilter === 'open') {
                     filtered = items.filter(item => !item.done);
@@ -568,23 +586,22 @@
                     return b.createdAt - a.createdAt;
                 });
 
-                // Render list
                 itemList.innerHTML = '';
                 if (filtered.length === 0) {
                     emptyState.style.display = 'block';
                     if (currentFilter === 'open') {
                         emptyState.querySelector('p strong').textContent = 'Keine offenen Einträge';
-                        emptyState.querySelector('p:last-child').textContent = 'Gut gemacht – nichts steht mehr an! 🎉';
+                        emptyState.querySelector('p:last-child').textContent = 'Fantastisch – alles vermieden! 🎉';
                         emptyState.querySelector('.emoji').textContent = '🎉';
                     } else if (currentFilter === 'done') {
                         emptyState.querySelector('p strong').textContent = 'Noch nichts abgehakt';
                         emptyState.querySelector('p:last-child').textContent =
-                            'Sobald du Dinge als erledigt markierst, erscheinen sie hier.';
+                            'Sobald du etwas als vermieden markierst, erscheint es hier.';
                         emptyState.querySelector('.emoji').textContent = '✅';
                     } else {
                         emptyState.querySelector('p strong').textContent = 'Noch keine Einträge';
                         emptyState.querySelector('p:last-child').textContent =
-                            'Füge Dinge hinzu, die du vermeiden möchtest.';
+                            'Füge Dinge hinzu, die du lieber lassen willst.';
                         emptyState.querySelector('.emoji').textContent = '📝';
                     }
                 } else {
@@ -598,9 +615,7 @@
                                 <span class="item-text">${escapeHTML(item.text)}</span>
                                 <button class="btn-delete" title="Löschen">×</button>
                             `;
-                        // Checkbox click
                         li.querySelector('.checkbox').addEventListener('click', () => toggleItem(item.id));
-                        // Delete click
                         li.querySelector('.btn-delete').addEventListener('click', (e) => {
                             e.stopPropagation();
                             deleteItem(item.id);
@@ -609,7 +624,6 @@
                     });
                 }
 
-                // Update stats
                 updateStats();
             }
 
@@ -632,19 +646,17 @@
             function addItem() {
                 const text = itemInput.value.trim();
                 if (!text) {
-                    showToast('😅 Bitte etwas eingeben!');
+                    showToast('😅 Schreib was rein, Känguru!');
                     itemInput.focus();
                     return;
                 }
                 if (text.length > 120) {
-                    showToast('📏 Maximal 120 Zeichen erlaubt.');
+                    showToast('📏 Maximal 120 Zeichen, sonst Meckerei vom Känguru.');
                     return;
                 }
-                // Check for duplicates (same text, not done)
-                const duplicate = items.some(item => item.text.toLowerCase() === text.toLowerCase() && !item
-                    .done);
+                const duplicate = items.some(item => item.text.toLowerCase() === text.toLowerCase() && !item.done);
                 if (duplicate) {
-                    showToast('⚠️ Dieser Eintrag existiert bereits (offen).');
+                    showToast('⚠️ Steht schon auf der Liste (offen).');
                     itemInput.select();
                     return;
                 }
@@ -684,40 +696,40 @@
                     items = items.filter(i => i.id !== id);
                     saveToStorage();
                     render();
-                    showToast('🗑️ Gelöscht.');
+                    showToast('🗑️ Weg damit.');
                 }
             }
 
             function clearDone() {
                 const doneCount = items.filter(i => i.done).length;
                 if (doneCount === 0) {
-                    showToast('ℹ️ Keine erledigten Einträge vorhanden.');
+                    showToast('ℹ️ Nichts abgehakt, Genosse.');
                     return;
                 }
-                if (confirm(doneCount + ' erledigte Einträge wirklich löschen?')) {
+                if (confirm(doneCount + ' abgehakte Einträge wirklich löschen?')) {
                     items = items.filter(i => !i.done);
                     saveToStorage();
                     render();
-                    showToast('🧹 ' + doneCount + ' erledigte Einträge entfernt.');
+                    showToast('🧹 ' + doneCount + ' erledigte Einträge entsorgt.');
                 }
             }
 
             function clearAll() {
                 if (items.length === 0) {
-                    showToast('ℹ️ Die Liste ist bereits leer.');
+                    showToast('ℹ️ Liste ist schon leer.');
                     return;
                 }
                 if (confirm('ALLE ' + items.length + ' Einträge unwiderruflich löschen?')) {
                     items = [];
                     saveToStorage();
                     render();
-                    showToast('🗑️ Alle Einträge gelöscht.');
+                    showToast('🗑️ Alles platt gemacht.');
                 }
             }
 
             function exportData() {
                 if (items.length === 0) {
-                    showToast('ℹ️ Nichts zum Exportieren.');
+                    showToast('ℹ️ Nichts zu exportieren.');
                     return;
                 }
                 const data = JSON.stringify(items, null, 2);
@@ -739,7 +751,6 @@
                     try {
                         const data = JSON.parse(e.target.result);
                         if (!Array.isArray(data)) throw new Error('Kein gültiges Array.');
-                        // Validate structure
                         const valid = data.every(obj =>
                             typeof obj === 'object' &&
                             typeof obj.id === 'string' &&
@@ -753,7 +764,6 @@
                             ' Einträge gefunden. Mit bestehenden zusammenführen?\n\nOK = Zusammenführen\nAbbrechen = Bestehende ersetzen'
                             );
                         if (merge) {
-                            // Merge: add only items with new IDs
                             const existingIds = new Set(items.map(i => i.id));
                             const newItems = data.filter(obj => !existingIds.has(obj.id));
                             items = [...items, ...newItems];
@@ -764,12 +774,11 @@
                         render();
                         showToast('📥 Import abgeschlossen (' + items.length + ' Einträge gesamt).');
                     } catch (err) {
-                        showToast('❌ Ungültige Datei – bitte eine gültige JSON-Datei wählen.');
+                        showToast('❌ Datei kaputt – bitte gültige JSON-Datei wählen.');
                         console.error('Importfehler:', err);
                     }
                 };
                 reader.readAsText(file);
-                // Reset file input
                 importFile.value = '';
             }
 
@@ -810,9 +819,7 @@
             render();
             itemInput.focus();
 
-            console.log('🚫 Not-To-Do Liste geladen –', items.length, 'Einträge');
-            console.log('💾 Speicher:', STORAGE_KEY);
-            console.log('📋 Filter:', currentFilter);
+            console.log('🦘 Not-To-Do Liste (Känguru-Edition) gestartet –', items.length, 'Einträge');
         })();
     </script>
 </body>
