@@ -3,18 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Not-To-Do Liste | Känguru-Modus mit Ordnung</title>
+    <title>To-Do & Not-To-Do | Känguru-Edition</title>
     <style>
         :root {
             --bg: #0a0a0a;
             --surface: #000;
             --card: #141414;
             --text: #f0f0f0;
-            --text-secondary: #aaa;
-            --accent: #d50000;
-            --accent-hover: #ff1a1a;
-            --yellow: #fc0;
-            --yellow-bg: rgba(255,204,0,0.08);
+            --text-secondary: #aaaaaa;
             --border: #2a2a2a;
             --shadow: 0 8px 32px rgba(0,0,0,0.7);
             --radius: 14px;
@@ -22,7 +18,29 @@
             --transition: 0.25s ease;
             --font-mono: 'Courier New', monospace;
         }
-        *{margin:0;padding:0;box-sizing:border-box;}
+
+        body {
+            --accent: #d50000;
+            --accent-hover: #ff1a1a;
+            --accent-shadow: rgba(213,0,0,0.5);
+            --done-color: #fc0;
+            --done-bg: rgba(255,204,0,0.08);
+            --badge-bg: #2a2a2a;
+            --tab-active: #d50000;
+            --tab-active-text: #fff;
+        }
+
+        body.mode-todo {
+            --accent: #00c853;
+            --accent-hover: #00e676;
+            --accent-shadow: rgba(0,200,83,0.5);
+            --done-color: #aeea00;
+            --done-bg: rgba(174,234,0,0.1);
+            --tab-active: #00c853;
+            --tab-active-text: #000;
+        }
+
+        * { margin:0; padding:0; box-sizing:border-box; }
         body {
             font-family: 'Segoe UI', Inter, system-ui, sans-serif;
             background: var(--bg);
@@ -31,16 +49,18 @@
             display: flex; justify-content: center; align-items: flex-start;
             padding: 20px;
             background-image:
-                radial-gradient(ellipse at 20% 20%, rgba(213,0,0,0.08) 0%, transparent 55%),
+                radial-gradient(ellipse at 20% 20%, var(--accent-shadow) 0%, transparent 55%),
                 radial-gradient(ellipse at 80% 70%, rgba(255,204,0,0.05) 0%, transparent 55%);
         }
         .container {
             width: 100%; max-width: 620px; margin-top: 20px;
-            display: flex; flex-direction: column; gap: 24px;
+            display: flex; flex-direction: column; gap: 20px;
         }
-        .header { text-align: center; padding: 10px 0; }
+
+        /* Header */
+        .header { text-align: center; padding: 5px 0; }
         .header .icon-row {
-            font-size: 3.2rem; margin-bottom: 4px;
+            font-size: 3.2rem; margin-bottom: 0;
             animation: hop 2.5s ease-in-out infinite; display: inline-block;
         }
         @keyframes hop {
@@ -51,48 +71,62 @@
             80%{transform:translateY(0);}
         }
         .header h1 {
-            font-size: 2.2rem; font-weight: 800; text-transform: uppercase;
+            font-size: 2rem; font-weight: 800; text-transform: uppercase;
             color: var(--accent); margin: 0;
-            text-shadow: 0 0 20px rgba(213,0,0,0.4);
+            text-shadow: 0 0 20px var(--accent-shadow);
         }
         .header .subtitle {
-            color: var(--text-secondary); font-size: 0.95rem;
+            color: var(--text-secondary); font-size: 0.9rem;
             margin-top: 2px; font-style: italic; font-family: var(--font-mono);
         }
-        .stats-bar {
-            display: flex; gap: 12px; flex-wrap: wrap; justify-content: center;
+
+        /* Tabs */
+        .tab-bar {
+            display: flex; gap: 8px; background: var(--card);
+            border-radius: 30px; padding: 5px; border: 1px solid var(--border);
         }
+        .tab-btn {
+            flex: 1; text-align: center; padding: 10px 16px;
+            border-radius: 26px; font-size: 0.9rem; font-weight: 600;
+            cursor: pointer; background: transparent; border: none;
+            color: var(--text-secondary); transition: var(--transition);
+            text-transform: uppercase; font-family: inherit;
+        }
+        .tab-btn.active {
+            background: var(--tab-active); color: var(--tab-active-text);
+            box-shadow: 0 4px 14px var(--accent-shadow);
+        }
+        .tab-btn:hover:not(.active) { color: var(--text); background: rgba(255,255,255,0.03); }
+
+        /* Stats */
+        .stats-bar { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; }
         .stat-pill {
             background: var(--card); border: 1px solid var(--border);
-            padding: 10px 18px; border-radius: 30px; font-size: 0.85rem;
-            color: var(--text-secondary); display: flex; align-items: center; gap: 7px;
+            padding: 8px 16px; border-radius: 30px; font-size: 0.8rem;
+            color: var(--text-secondary); display: flex; align-items: center; gap: 6px;
         }
-        .stat-pill span { font-weight: 700; font-size: 1.1rem; }
+        .stat-pill span { font-weight: 700; font-size: 1rem; }
         .stat-pill.danger span { color: var(--accent); }
-        .stat-pill.success span { color: var(--yellow); }
+        .stat-pill.success span { color: var(--done-color); }
 
-        /* InputCard */
+        /* Input */
         .input-card {
             background: var(--card); border: 1px solid var(--border);
-            border-radius: var(--radius); padding: 20px;
+            border-radius: var(--radius); padding: 16px;
             box-shadow: var(--shadow); display: flex; gap: 8px;
-            align-items: center; flex-wrap: wrap; transition: var(--transition);
+            align-items: center; flex-wrap: wrap;
         }
         .input-card:focus-within {
             border-color: var(--accent);
-            box-shadow: 0 8px 32px rgba(213,0,0,0.25);
+            box-shadow: 0 8px 32px var(--accent-shadow);
         }
-        .input-row {
-            display: flex; gap: 8px; flex: 1; min-width: 0;
-        }
+        .input-row { display: flex; gap: 8px; flex: 1; min-width: 0; }
         .order-input {
             width: 48px; background: var(--card); border: 1px solid var(--border);
             border-radius: 30px; color: var(--text); text-align: center;
             font-family: var(--font-mono); font-size: 0.9rem; outline: none;
-            transition: var(--transition);
         }
         .order-input:focus { border-color: var(--accent); }
-        .order-input::placeholder { color: var(--text-secondary); opacity: 0.5; }
         .text-input {
             flex: 1; background: transparent; border: none; outline: none;
             font-size: 1rem; color: var(--text); padding: 8px 4px;
@@ -100,25 +134,25 @@
         }
         .text-input::placeholder { color: var(--text-secondary); opacity: 0.6; font-style: italic; }
         .btn {
-            border: none; cursor: pointer; font-weight: 700; font-size: 0.9rem;
-            padding: 10px 20px; border-radius: 30px; transition: var(--transition);
+            border: none; cursor: pointer; font-weight: 700; font-size: 0.85rem;
+            padding: 10px 18px; border-radius: 30px; transition: var(--transition);
             font-family: inherit; text-transform: uppercase; white-space: nowrap;
         }
         .btn-add {
             background: var(--accent); color: #fff;
-            box-shadow: 0 4px 16px rgba(213,0,0,0.5);
+            box-shadow: 0 4px 16px var(--accent-shadow);
             border: 1px solid rgba(255,255,255,0.1);
         }
         .btn-add:hover { background: var(--accent-hover); transform: translateY(-1px); }
 
-        /* Filter Tabs */
+        /* Filter */
         .filter-tabs {
             display: flex; gap: 6px; background: var(--card);
             border-radius: 30px; padding: 5px; border: 1px solid var(--border);
         }
         .filter-tab {
-            flex: 1; text-align: center; padding: 9px 14px; border-radius: 26px;
-            font-size: 0.85rem; font-weight: 600; cursor: pointer;
+            flex: 1; text-align: center; padding: 8px 12px; border-radius: 26px;
+            font-size: 0.8rem; font-weight: 600; cursor: pointer;
             color: var(--text-secondary); background: transparent; border: none;
             text-transform: uppercase; transition: var(--transition);
         }
@@ -131,14 +165,14 @@
             border-radius: var(--radius); box-shadow: var(--shadow); overflow: hidden;
         }
         .list-card ul {
-            list-style: none; max-height: 450px; overflow-y: auto;
+            list-style: none; max-height: 380px; overflow-y: auto;
             scrollbar-width: thin; scrollbar-color: var(--border) transparent;
         }
         .list-card ul::-webkit-scrollbar { width: 5px; }
         .list-card ul::-webkit-scrollbar-thumb { background: var(--border); border-radius: 10px; }
         .list-card ul li {
             display: flex; align-items: center; gap: 10px;
-            padding: 12px 16px; border-bottom: 1px solid var(--border);
+            padding: 10px 16px; border-bottom: 1px solid var(--border);
             transition: var(--transition); animation: slideIn 0.3s ease;
         }
         @keyframes slideIn { from{opacity:0;transform:translateX(-20px);} to{opacity:1;transform:translateX(0);} }
@@ -146,15 +180,15 @@
         .list-card ul li:hover { background: rgba(255,255,255,0.02); }
         .list-card ul li.done .order-badge { opacity: 0.4; }
         .list-card ul li.done .item-text {
-            text-decoration: line-through; opacity: 0.5; color: var(--yellow);
+            text-decoration: line-through; opacity: 0.5; color: var(--done-color);
         }
-        .list-card ul li.done { background: var(--yellow-bg); }
+        .list-card ul li.done { background: var(--done-bg); }
         .order-badge {
             flex-shrink: 0; width: 28px; height: 28px; border-radius: 50%;
-            background: var(--border); color: var(--text);
+            background: var(--badge-bg); color: var(--text);
             font-weight: 700; font-size: 0.8rem; font-family: var(--font-mono);
             display: flex; align-items: center; justify-content: center;
-            text-transform: uppercase; transition: var(--transition);
+            text-transform: uppercase;
         }
         .checkbox {
             flex-shrink: 0; width: 24px; height: 24px; border-radius: 50%;
@@ -165,11 +199,11 @@
         }
         .checkbox:hover { border-color: var(--accent); }
         li.done .checkbox {
-            background: var(--yellow); border-color: var(--yellow);
-            color: #000; box-shadow: 0 0 14px rgba(255,204,0,0.5);
+            background: var(--done-color); border-color: var(--done-color);
+            color: #000; box-shadow: 0 0 12px var(--done-color);
         }
         .item-text {
-            flex: 1; font-size: 0.95rem; word-break: break-word;
+            flex: 1; font-size: 0.9rem; word-break: break-word;
             font-family: var(--font-mono); transition: var(--transition);
         }
         .btn-delete {
@@ -179,26 +213,28 @@
             display: flex; align-items: center; justify-content: center; opacity: 0;
         }
         .list-card ul li:hover .btn-delete { opacity: 1; }
-        .btn-delete:hover { background: rgba(213,0,0,0.25); color: var(--accent); }
+        .btn-delete:hover { background: rgba(255,255,255,0.1); color: var(--accent); }
 
         .empty-state { text-align: center; padding: 40px 20px; color: var(--text-secondary); font-family: var(--font-mono); }
         .empty-state .emoji { font-size: 3rem; display: block; margin-bottom: 10px; }
 
+        /* Footer */
         .footer-actions { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; }
         .btn-outline {
             background: transparent; border: 1px solid var(--border);
-            color: var(--text-secondary); padding: 9px 16px; border-radius: 30px;
-            font-size: 0.8rem; cursor: pointer; font-weight: 600; text-transform: uppercase;
+            color: var(--text-secondary); padding: 8px 14px; border-radius: 30px;
+            font-size: 0.75rem; cursor: pointer; font-weight: 600; text-transform: uppercase;
             transition: var(--transition);
         }
-        .btn-outline:hover { border-color: var(--accent); color: var(--accent); background: rgba(213,0,0,0.07); }
-        .btn-outline.danger:hover { border-color: #f44; color: #f44; background: rgba(255,68,68,0.08); }
+        .btn-outline:hover { border-color: var(--accent); color: var(--accent); background: rgba(255,255,255,0.03); }
+        .btn-outline.danger:hover { border-color: #ff4444; color: #ff4444; background: rgba(255,68,68,0.08); }
 
+        /* Toast */
         .toast {
             position: fixed; bottom: 30px; left: 50%;
             transform: translateX(-50%) translateY(100px);
             background: var(--card); border: 1px solid var(--border);
-            padding: 12px 24px; border-radius: 30px; font-size: 0.85rem;
+            padding: 12px 24px; border-radius: 30px; font-size: 0.8rem;
             font-weight: 600; color: var(--text); font-family: var(--font-mono);
             box-shadow: 0 8px 28px rgba(0,0,0,0.7); transition: transform 0.35s ease;
             z-index: 100; pointer-events: none;
@@ -206,11 +242,12 @@
         .toast.show { transform: translateX(-50%) translateY(0); }
 
         @media (max-width: 480px) {
-            .header h1 { font-size: 1.6rem; }
+            .header h1 { font-size: 1.5rem; }
             .input-card { flex-direction: column; align-items: stretch; }
             .input-row { flex-wrap: wrap; }
             .order-input { width: 100%; }
             .btn-add { width: 100%; text-align: center; }
+            .list-card ul { max-height: 280px; }
         }
     </style>
 </head>
@@ -218,39 +255,50 @@
 <div class="container">
     <header class="header">
         <div class="icon-row">🦘</div>
-        <h1>Not-To-Do Liste</h1>
-        <p class="subtitle">Ordnung ist das halbe Leben -Drachenlord-</p>
+        <h1 id="header-title">Not-To-Do</h1>
+        <p class="subtitle">Ordnung muss sein – erst Zahlen, dann Buchstaben</p>
     </header>
 
+    <!-- Tabs -->
+    <div class="tab-bar">
+        <button class="tab-btn active" data-list="nottodo">🚫 Not-To-Do</button>
+        <button class="tab-btn" data-list="todo">✅ To-Do</button>
+    </div>
+
+    <!-- Stats -->
     <div class="stats-bar">
         <div class="stat-pill">📋 Insgesamt: <span id="stat-total">0</span></div>
         <div class="stat-pill danger">⚠️ Offen: <span id="stat-open">0</span></div>
         <div class="stat-pill success">✅ Erledigt: <span id="stat-done">0</span></div>
     </div>
 
+    <!-- Input -->
     <div class="input-card">
         <div class="input-row">
-            <input type="text" class="order-input" id="order-input" placeholder="1/a" maxlength="3" autocomplete="off" title="Ordnung: Zahl (1) oder Buchstabe (a)">
-            <input type="text" class="text-input" id="item-input" placeholder="z.B. Kein Nazi sein..." maxlength="120" autocomplete="off">
+            <input type="text" class="order-input" id="order-input" placeholder="1/a" maxlength="3" autocomplete="off" title="Ordnung: 1, 2, a, b...">
+            <input type="text" class="text-input" id="item-input" placeholder="Was willst du vermeiden?" maxlength="120" autocomplete="off">
         </div>
         <button class="btn btn-add" id="btn-add">+ Hinzufügen</button>
     </div>
 
+    <!-- Filter -->
     <div class="filter-tabs">
         <button class="filter-tab active" data-filter="all">Alle</button>
         <button class="filter-tab" data-filter="open">⚠️ Offen</button>
         <button class="filter-tab" data-filter="done">✅ Abgehakt</button>
     </div>
 
+    <!-- List -->
     <div class="list-card">
         <ul id="item-list"></ul>
         <div class="empty-state" id="empty-state">
             <span class="emoji">📝</span>
             <p><strong>Noch keine Einträge</strong></p>
-            <p>Gib eine Ordnung (1,2,a,b…) und einen Text ein.</p>
+            <p>Gib eine Ordnung und einen Text ein.</p>
         </div>
     </div>
 
+    <!-- Footer -->
     <div class="footer-actions">
         <button class="btn-outline" id="btn-export">📤 Export</button>
         <button class="btn-outline" id="btn-import-trigger">📥 Import</button>
@@ -264,6 +312,9 @@
 
 <script>
 (function() {
+    // ─── DOM ──────────────────────────────
+    const headerTitle = document.getElementById('header-title');
+    const tabBtns = document.querySelectorAll('.tab-btn');
     const orderInput = document.getElementById('order-input');
     const textInput = document.getElementById('item-input');
     const btnAdd = document.getElementById('btn-add');
@@ -280,98 +331,146 @@
     const btnClearDone = document.getElementById('btn-clear-done');
     const btnClearAll = document.getElementById('btn-clear-all');
 
-    const STORAGE_KEY = 'not-to-do-ordered';
-    let items = [];
+    // ─── State ────────────────────────────
+    const STORAGE_TODO = 'todo-ordered';
+    const STORAGE_NOTTODO = 'not-to-do-ordered';
+    const STORAGE_LAST_TAB = 'lastActiveList';
+
+    let activeList = localStorage.getItem(STORAGE_LAST_TAB) === 'todo' ? 'todo' : 'nottodo';
+    let todoItems = [];
+    let nottodoItems = [];
     let currentFilter = 'all';
     let toastTimer = null;
 
+    // Eingabe-Cache pro Liste
+    const inputCache = {
+        todo: { order: '', text: '' },
+        nottodo: { order: '', text: '' }
+    };
+
+    function getItems() {
+        return activeList === 'todo' ? todoItems : nottodoItems;
+    }
+
+    function setItems(newItems) {
+        if (activeList === 'todo') todoItems = newItems;
+        else nottodoItems = newItems;
+    }
+
+    // ─── Toast ────────────────────────────
     function showToast(msg) {
         if (toastTimer) clearTimeout(toastTimer);
         toast.textContent = msg;
         toast.classList.add('show');
-        toastTimer = setTimeout(() => { toast.classList.remove('show'); }, 2000);
+        toastTimer = setTimeout(() => toast.classList.remove('show'), 2200);
     }
 
+    // ─── LocalStorage Wrapper ────────────
     function save() {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
+        localStorage.setItem(STORAGE_TODO, JSON.stringify(todoItems));
+        localStorage.setItem(STORAGE_NOTTODO, JSON.stringify(nottodoItems));
     }
+
     function load() {
         try {
-            const raw = localStorage.getItem(STORAGE_KEY);
-            if (raw) {
-                const parsed = JSON.parse(raw);
-                if (Array.isArray(parsed)) items = parsed;
-            }
-        } catch (e) { items = []; }
+            const rawTodo = localStorage.getItem(STORAGE_TODO);
+            if (rawTodo) todoItems = JSON.parse(rawTodo);
+            else todoItems = [];
+        } catch (e) { todoItems = []; }
+
+        try {
+            const rawNot = localStorage.getItem(STORAGE_NOTTODO);
+            if (rawNot) nottodoItems = JSON.parse(rawNot);
+            else nottodoItems = [];
+        } catch (e) { nottodoItems = []; }
     }
 
+    // ─── Ordnung / Sortierung ─────────────
     function normalizeOrder(val) {
-        // val ist String | null
-        if (val === null || val === undefined) return null;
-        const trimmed = val.trim();
-        if (trimmed === '') return null;
-        // Prüfe, ob es eine positive Ganzzahl ist (1, 2, 10 ...)
-        if (/^\d+$/.test(trimmed)) {
-            const num = parseInt(trimmed, 10);
-            return { type: 'number', value: num, raw: trimmed };
-        }
-        // Prüfe, ob ein einzelner Buchstabe (a-z oder A-Z) vorliegt
-        if (/^[a-zA-Z]$/.test(trimmed)) {
-            return { type: 'letter', value: trimmed.toLowerCase(), raw: trimmed };
-        }
-        // Andernfalls als String
-        return { type: 'string', value: trimmed.toLowerCase(), raw: trimmed };
+        if (!val) return null;
+        const t = val.trim();
+        if (t === '') return null;
+        if (/^\d+$/.test(t)) return { type: 'number', value: parseInt(t,10), raw: t };
+        if (/^[a-zA-Z]$/.test(t)) return { type: 'letter', value: t.toLowerCase(), raw: t };
+        return { type: 'string', value: t.toLowerCase(), raw: t };
     }
 
     function compareOrder(a, b) {
         const oa = normalizeOrder(a.order);
         const ob = normalizeOrder(b.order);
-        // Beide nicht gesetzt -> nach Erstellungsdatum (neueste zuerst)
         if (!oa && !ob) return 0;
-        // Nur a gesetzt -> a kommt vor b
         if (oa && !ob) return -1;
-        // Nur b gesetzt -> b kommt vor a
         if (!oa && ob) return 1;
-        // Beide gesetzt
-        if (oa.type === 'number' && ob.type === 'number') {
-            return oa.value - ob.value || a.createdAt - b.createdAt;
-        }
+        if (oa.type === 'number' && ob.type === 'number') return oa.value - ob.value || a.createdAt - b.createdAt;
         if (oa.type === 'number' && ob.type !== 'number') return -1;
         if (oa.type !== 'number' && ob.type === 'number') return 1;
-        if (oa.type === 'letter' && ob.type === 'letter') {
-            return oa.value.localeCompare(ob.value) || a.createdAt - b.createdAt;
-        }
+        if (oa.type === 'letter' && ob.type === 'letter') return oa.value.localeCompare(ob.value) || a.createdAt - b.createdAt;
         if (oa.type === 'letter' && ob.type === 'string') return -1;
         if (oa.type === 'string' && ob.type === 'letter') return 1;
-        // beide strings
         return oa.value.localeCompare(ob.value) || a.createdAt - b.createdAt;
     }
 
+    // ─── UI anpassen an aktiven Tab ──────
+    function applyTabStyle() {
+        document.body.classList.remove('mode-todo', 'mode-nottodo');
+        if (activeList === 'todo') {
+            document.body.classList.add('mode-todo');
+            headerTitle.textContent = 'To-Do';
+            textInput.placeholder = 'Was willst du erledigen?';
+        } else {
+            document.body.classList.add('mode-nottodo');
+            headerTitle.textContent = 'Not-To-Do';
+            textInput.placeholder = 'Was willst du vermeiden?';
+        }
+        // Tabs aktiv setzen
+        tabBtns.forEach(btn => {
+            const list = btn.getAttribute('data-list');
+            btn.classList.toggle('active', list === activeList);
+        });
+    }
+
+    function restoreInputCache() {
+        const cache = inputCache[activeList];
+        orderInput.value = cache.order;
+        textInput.value = cache.text;
+    }
+
+    function saveInputCache() {
+        inputCache[activeList] = {
+            order: orderInput.value,
+            text: textInput.value
+        };
+    }
+
+    // ─── Render ──────────────────────────
     function render() {
+        const items = getItems();
         let filtered = items;
         if (currentFilter === 'open') filtered = items.filter(i => !i.done);
         else if (currentFilter === 'done') filtered = items.filter(i => i.done);
 
-        // Sortierung: nach Order (1,2,3 … a,b,c …) dann Erstellungsdatum
+        // Sortierung nach Ordnung + Erstellungsdatum
         filtered.sort((a, b) => compareOrder(a, b) || b.createdAt - a.createdAt);
 
         itemList.innerHTML = '';
+
         if (filtered.length === 0) {
             emptyState.style.display = 'block';
             const strong = emptyState.querySelector('p strong');
             const last = emptyState.querySelector('p:last-child');
             const emoji = emptyState.querySelector('.emoji');
+            const listType = activeList === 'todo' ? 'To-Do' : 'Not-To-Do';
             if (currentFilter === 'open') {
                 strong.textContent = 'Keine offenen Einträge';
-                last.textContent = 'Vermeide mehr mein Sorgenkind!';
-                emoji.textContent = '🤔';
+                last.textContent = activeList === 'todo' ? 'Alles erledigt – fantastisch! 🎉' : 'Alles vermieden – fantastisch! 🎉';
+                emoji.textContent = '🎉';
             } else if (currentFilter === 'done') {
                 strong.textContent = 'Noch nichts abgehakt';
-                last.textContent = 'Vermeide brav weiter.';
+                last.textContent = 'Sobald du etwas abhakst, erscheint es hier.';
                 emoji.textContent = '✅';
             } else {
-                strong.textContent = 'Noch keine Einträge';
-                last.textContent = 'Füge Dinge mit Ordnung hinzu.';
+                strong.textContent = `Noch keine ${listType}-Einträge`;
+                last.textContent = 'Gib eine Ordnung und einen Text ein.';
                 emoji.textContent = '📝';
             }
         } else {
@@ -381,9 +480,9 @@
                 if (item.done) li.classList.add('done');
                 li.setAttribute('data-id', item.id);
 
-                const orderBadge = document.createElement('span');
-                orderBadge.className = 'order-badge';
-                orderBadge.textContent = item.order && item.order.trim() !== '' ? item.order.trim() : '–';
+                const badge = document.createElement('span');
+                badge.className = 'order-badge';
+                badge.textContent = item.order && item.order.trim() !== '' ? item.order.trim() : '–';
 
                 const checkbox = document.createElement('button');
                 checkbox.className = 'checkbox';
@@ -395,23 +494,24 @@
                 textSpan.className = 'item-text';
                 textSpan.textContent = item.text;
 
-                const deleteBtn = document.createElement('button');
-                deleteBtn.className = 'btn-delete';
-                deleteBtn.title = 'Löschen';
-                deleteBtn.textContent = '×';
-                deleteBtn.addEventListener('click', (e) => { e.stopPropagation(); deleteItem(item.id); });
+                const delBtn = document.createElement('button');
+                delBtn.className = 'btn-delete';
+                delBtn.title = 'Löschen';
+                delBtn.textContent = '×';
+                delBtn.addEventListener('click', (e) => { e.stopPropagation(); deleteItem(item.id); });
 
-                li.appendChild(orderBadge);
+                li.appendChild(badge);
                 li.appendChild(checkbox);
                 li.appendChild(textSpan);
-                li.appendChild(deleteBtn);
+                li.appendChild(delBtn);
                 itemList.appendChild(li);
             });
         }
-        updateStats();
+
+        updateStats(items);
     }
 
-    function updateStats() {
+    function updateStats(items) {
         const total = items.length;
         const done = items.filter(i => i.done).length;
         statTotal.textContent = total;
@@ -419,12 +519,14 @@
         statDone.textContent = done;
     }
 
+    // ─── Aktionen ────────────────────────
     function addItem() {
-        let orderVal = orderInput.value.trim();
+        const orderVal = orderInput.value.trim();
         const textVal = textInput.value.trim();
         if (!textVal) { showToast('😅 Text fehlt!'); return; }
         if (textVal.length > 120) { showToast('📏 Max 120 Zeichen!'); return; }
-        // Duplikatprüfung (gleicher Text + gleiche Order und offen)
+
+        const items = getItems();
         const duplicate = items.some(i =>
             i.text.toLowerCase() === textVal.toLowerCase() &&
             (i.order || '') === (orderVal || '') &&
@@ -440,29 +542,36 @@
             createdAt: Date.now()
         };
         items.unshift(newItem);
+        setItems(items);
         save();
         orderInput.value = '';
         textInput.value = '';
+        saveInputCache();
         textInput.focus();
         render();
-        showToast('✅ „' + (orderVal ? orderVal + ' ' : '') + truncate(textVal, 30) + '„');
+        const prefix = orderVal ? orderVal + ' ' : '';
+        showToast('✅ „' + prefix + truncate(textVal, 30) + '„');
     }
 
     function toggleItem(id) {
+        const items = getItems();
         const item = items.find(i => i.id === id);
         if (!item) return;
         item.done = !item.done;
         if (item.done) item.doneAt = Date.now(); else delete item.doneAt;
+        setItems(items);
         save();
         render();
         showToast('🔄 „' + truncate(item.text, 25) + '„ ' + (item.done ? 'abgehakt ✅' : 'wieder offen ⚠️'));
     }
 
     function deleteItem(id) {
+        const items = getItems();
         const item = items.find(i => i.id === id);
         if (!item) return;
         if (confirm('Löschen?\n„' + item.text + '„')) {
-            items = items.filter(i => i.id !== id);
+            const filtered = items.filter(i => i.id !== id);
+            setItems(filtered);
             save();
             render();
             showToast('🗑️ Gelöscht.');
@@ -470,10 +579,12 @@
     }
 
     function clearDone() {
+        const items = getItems();
         const count = items.filter(i => i.done).length;
         if (count === 0) { showToast('ℹ️ Nichts abgehakt.'); return; }
         if (confirm(count + ' erledigte Einträge löschen?')) {
-            items = items.filter(i => !i.done);
+            const filtered = items.filter(i => !i.done);
+            setItems(filtered);
             save();
             render();
             showToast('🧹 ' + count + ' erledigte entsorgt.');
@@ -481,9 +592,10 @@
     }
 
     function clearAll() {
+        const items = getItems();
         if (items.length === 0) { showToast('ℹ️ Liste leer.'); return; }
         if (confirm('ALLE ' + items.length + ' Einträge unwiderruflich löschen?')) {
-            items = [];
+            setItems([]);
             save();
             render();
             showToast('🗑️ Alles platt.');
@@ -491,11 +603,13 @@
     }
 
     function exportData() {
+        const items = getItems();
         if (!items.length) { showToast('ℹ️ Nichts zu exportieren.'); return; }
+        const name = activeList === 'todo' ? 'to-do-liste' : 'not-to-do-liste';
         const blob = new Blob([JSON.stringify(items, null, 2)], { type: 'application/json' });
         const a = document.createElement('a');
         a.href = URL.createObjectURL(blob);
-        a.download = 'not-to-do-liste-' + new Date().toISOString().slice(0,10) + '.json';
+        a.download = name + '-' + new Date().toISOString().slice(0,10) + '.json';
         a.click(); URL.revokeObjectURL(a.href);
         showToast('📤 Exportiert (' + items.length + ' Einträge).');
     }
@@ -511,15 +625,21 @@
                     typeof obj.done === 'boolean' && typeof obj.createdAt === 'number'
                 );
                 if (!valid) throw new Error();
-                const merge = confirm(data.length + ' Einträge gefunden. Zusammenführen?');
+                const items = getItems();
+                const merge = confirm(data.length + ' Einträge gefunden. Mit aktueller Liste zusammenführen?');
+                let newList;
                 if (merge) {
                     const existingIds = new Set(items.map(i => i.id));
-                    items = [...items, ...data.filter(d => !existingIds.has(d.id))];
-                } else items = data;
-                save(); render();
-                showToast('📥 Import abgeschlossen (' + items.length + ' Einträge).');
+                    newList = [...items, ...data.filter(d => !existingIds.has(d.id))];
+                } else {
+                    newList = data;
+                }
+                setItems(newList);
+                save();
+                render();
+                showToast('📥 Import abgeschlossen (' + newList.length + ' Einträge).');
             } catch (ex) {
-                showToast('❌ Keine gültige Not-To-Do Datei.');
+                showToast('❌ Keine gültige Datei.');
             }
         };
         reader.readAsText(file);
@@ -528,27 +648,61 @@
 
     function truncate(t, max) { return t.length > max ? t.slice(0, max) + '…' : t; }
 
-    // Event Listener
+    // ─── Tab-Wechsel ──────────────────────
+    function switchTab(listName) {
+        if (activeList === listName) return;
+        saveInputCache();
+        activeList = listName;
+        localStorage.setItem(STORAGE_LAST_TAB, activeList);
+        // Filter zurücksetzen
+        currentFilter = 'all';
+        filterTabs.forEach(t => t.classList.remove('active'));
+        const allTab = document.querySelector('.filter-tab[data-filter="all"]');
+        if (allTab) allTab.classList.add('active');
+        applyTabStyle();
+        restoreInputCache();
+        render();
+        textInput.focus();
+    }
+
+    // ─── Event Listener ──────────────────
+    tabBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+            const list = btn.getAttribute('data-list');
+            switchTab(list);
+        });
+    });
+
     btnAdd.addEventListener('click', addItem);
-    textInput.addEventListener('keydown', (e) => {
+    textInput.addEventListener('keydown', e => {
         if (e.key === 'Enter') { e.preventDefault(); addItem(); }
     });
-    orderInput.addEventListener('keydown', (e) => {
+    orderInput.addEventListener('keydown', e => {
         if (e.key === 'Enter') { e.preventDefault(); textInput.focus(); }
     });
-    filterTabs.forEach(tab => tab.addEventListener('click', () => {
-        filterTabs.forEach(t => t.classList.remove('active'));
-        tab.classList.add('active');
-        currentFilter = tab.dataset.filter;
-        render();
-    }));
+
+    filterTabs.forEach(tab => {
+        tab.addEventListener('click', () => {
+            filterTabs.forEach(t => t.classList.remove('active'));
+            tab.classList.add('active');
+            currentFilter = tab.getAttribute('data-filter');
+            render();
+        });
+    });
+
     btnExport.addEventListener('click', exportData);
     btnImportTrigger.addEventListener('click', () => importFile.click());
-    importFile.addEventListener('change', (e) => { if (e.target.files[0]) importData(e.target.files[0]); });
+    importFile.addEventListener('change', e => { if (e.target.files[0]) importData(e.target.files[0]); });
     btnClearDone.addEventListener('click', clearDone);
     btnClearAll.addEventListener('click', clearAll);
 
+    // ─── Init ────────────────────────────
     load();
+    applyTabStyle();
+    restoreInputCache();
+    // Falls zuletzt todo aktiv war, all-Filter korrekt setzen
+    const allFilter = document.querySelector('.filter-tab[data-filter="all"]');
+    if (allFilter) allFilter.classList.add('active');
     render();
     textInput.focus();
 })();
